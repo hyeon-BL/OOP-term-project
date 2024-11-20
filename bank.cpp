@@ -1,56 +1,24 @@
-#include <iostream>
-#include <string>
-#include "account.h"
 #include "bank.h"
+#include "account.h"
+#include <iostream>
 
-using namespace std;
-
-class Bank {
-protected:
-	string bankname;
-	Account* accounts[1000];//일단 1000개로 잡음
-	int numaccounts;//number of accounts of specific bank
-	bool isprimarybank;//primary bank specifier
-	int dfee;//deposit fee
-	int wfee;//withdrawal fee
-	int afee;//account transfer fee
-	int cfee;//cash transfer fee
-
-public:
-	Bank(string bankname);
-	~Bank();
-	bool getisprimarybank() { return this->isprimarybank; };
-	int getdfee() { return this->dfee; }
-	int getwfee() { return this->wfee; }
-	int getafee() { return this->afee; }
-	int getcfee() { return this->cfee; }
-
-	void createaccount();//account에 맞춰서 짜야함
-	void printbankaccount();//account에 맞춰서 짜야함
-	int* depositcashtoatm(int amount);//deposit cashes to an atm to serve user(각 지폐 단위로)
-	Account* createAccount(std::string name, int accountNumber, double initialBalance);
-	Account* getAccount(int accountNumber) const;
-};
-
-Bank::Bank(string name) {
-	bankname = name;
-	numaccounts = 0;
-	for (int i = 0; i < 1000; i++) {
-		accounts[i] = nullptr;
-	}
+Bank::Bank(std::string name) : bankname(name), numaccounts(0) {
+    for (int i = 0; i < 1000; i++) {
+        accounts[i] = nullptr;
+    }
 }
 
 Bank::~Bank() {
-	for (int i = 0; i < numaccounts; i++) {
-		delete accounts[i];
-	}
+    for (int i = 0; i < numaccounts; i++) {
+        delete accounts[i];
+    }
 }
 
-void Bank::createaccount() {
-	if (numaccounts < 1000) {
-		accounts[numaccounts] = new Account();
-		numaccounts++;
-	}
+void Bank::createaccount(std::string name, int number, double balance) {
+    if (numaccounts < 1000) {
+        accounts[numaccounts] = new Account(name, number, balance, bankname);
+        numaccounts++;
+    }
 }
 
 Account* Bank::createAccount(std::string name, int accountNumber, double initialBalance) {
@@ -70,50 +38,38 @@ Account* Bank::getAccount(int accountNumber) const {
     return nullptr;
 }
 
-void Bank::printbankaccount() {
-	for (int i = 0; i < numaccounts; i++) {
-		cout << "Bank: " << bankname 
+void Bank::printbankaccount() const {
+    for (int i = 0; i < numaccounts; i++) {
+        std::cout << "Bank: " << bankname 
              << ", Username: " << accounts[i]->getAccName()
              << ", Account: " << accounts[i]->getAccNumber()
-             << ", Balance: " << accounts[i]->getBalance() << endl;
-	}
+             << ", Balance: " << accounts[i]->getBalance() << std::endl;
+    }
 }
 
 int* Bank::depositcashtoatm(int amount) {
-	int result[4];
-	int t = 50000;
-	for (int i = 0; i < 4; i++) {
-		amount = amount / t;
-		result[i] = amount;
-		t == 10000 ? t = t / 2 : t = t / 5;
-		}
-	return result;
-	}
+    int* result = new int[4];
+    int t = 50000;
+    for (int i = 0; i < 4; i++) {
+        result[i] = amount / t;
+        amount %= t;
+        t = (t == 10000) ? t / 2 : t / 5;
+    }
+    return result;
+}
 
+PrimaryBank::PrimaryBank(std::string name) : Bank(name) {
+    isprimarybank = true;
+    dfee = 1000;
+    wfee = 1000;
+    afee = 2000;
+    cfee = 1000;
+}
 
-
-
-class PrimaryBank : public Bank {
-public:
-	PrimaryBank(string name) : Bank(name) {
-		isprimarybank = true;
-		dfee = 1000;
-		wfee = 1000;
-		afee = 2000;
-		cfee = 1000;
-	}
-	~PrimaryBank() {};
-};
-
-class NonPrimaryBank : public Bank {
-public:
-	NonPrimaryBank(string name) : Bank(name) {
-		isprimarybank = false;
-		dfee = 2000;
-		wfee = 2000;
-		afee = 3000;
-		cfee = 1000;
-	}
-	~NonPrimaryBank() {};
-
-};
+NonPrimaryBank::NonPrimaryBank(std::string name) : Bank(name) {
+    isprimarybank = false;
+    dfee = 2000;
+    wfee = 2000;
+    afee = 3000;
+    cfee = 1000;
+}

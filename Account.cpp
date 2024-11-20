@@ -4,15 +4,14 @@
 
 using namespace std;
 
-Account::Account(string name, int number, double initialBalance, string bank) {
-    accName = name;
-    accNumber = number;
-    balance = initialBalance;
-    bankName = bank;
+Account::Account(std::string name, int number, double initialBalance, std::string bank) 
+    : accName(name), accNumber(number), balance(initialBalance), bankName(bank) {
 }
 
 Account::~Account() {
+    // No dynamic allocations to clean up
 }
+
 string Account::getAccName() const {
     return accName;
 }
