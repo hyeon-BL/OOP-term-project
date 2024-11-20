@@ -1,12 +1,5 @@
-#include<iostream>
-#include<string>
-#include"account.h"
-#include"bank.h"
 #include "atm.h"
-#include <iostream>
 #include <ctime>
-
-using namespace std;
 
 int Transaction::nextTransactionId = 1;
 
@@ -129,23 +122,4 @@ bool ATM::transfer(Account* target, double amount) {
     Transaction trans("Transfer", amount);
     currentSession->addTransaction(trans);
     return true;
-}
-
-// Update main for testing
-int main() {
-    PrimaryBank* bank = new PrimaryBank("TestBank");
-    ATM* atm = new ATM(315785, ATMType::SingleBank, true, bank);
-    
-    // Create test account
-    Account* testAccount = bank->createAccount("John Doe", 12345, 10000.0);
-    
-    // Test ATM operations
-    atm->insertCard(testAccount);
-    atm->deposit(5000);
-    atm->withdraw(2000);
-    atm->endSession();
-    
-    delete atm;
-    delete bank;
-    return 0;
 }
