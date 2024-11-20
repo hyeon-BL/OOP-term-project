@@ -1,17 +1,30 @@
-// Basic Account class (will be expanded later)
+#ifndef ACCOUNT_H
+#define ACCOUNT_H
+
+#include <string>
+#include <vector>
+
 class Account {
 private:
-    std::string accountNumber;
-    std::string ownerName;
+    std::string accName;
+    int accNumber;
     double balance;
     std::string bankName;
+    std::vector<std::string> transactionHistory;
 
 public:
-    Account(std::string accNum, std::string owner, std::string bank, double initialBalance = 0)
-        : accountNumber(accNum), ownerName(owner), bankName(bank), balance(initialBalance) {}
+    Account(std::string name, int number, double initialBalance = 0.0, std::string bank = "");
+    ~Account();
 
-    std::string getAccountNumber() const { return accountNumber; }
-    std::string getOwnerName() const { return ownerName; }
+    std::string getAccName() const;
+    int getAccNumber() const;
+    double getBalance() const;
     std::string getBankName() const { return bankName; }
-    double getBalance() const { return balance; }
+    std::vector<std::string> getTransactionHistory() const;
+
+    void deposit(double amount);
+    bool withdraw(double amount);
+    void addTransaction(const std::string& transaction);
 };
+
+#endif

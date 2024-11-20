@@ -4,10 +4,11 @@
 
 using namespace std;
 
-Account::Account(string name, int number, double initialBalance) {
+Account::Account(string name, int number, double initialBalance, string bank) {
     accName = name;
     accNumber = number;
     balance = initialBalance;
+    bankName = bank;
 }
 
 Account::~Account() {

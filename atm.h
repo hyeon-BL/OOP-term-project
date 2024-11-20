@@ -2,47 +2,62 @@
 #define ATM_H
 
 #include <string>
-#include <unordered_map>
 #include <vector>
+#include "bank.h"
+#include "account.h"
 
-enum class ATMType { SINGLE_BANK, MULTI_BANK };
-enum class Language { ENGLISH, KOREAN };
-enum class CashType { KRW1000, KRW5000, KRW10000, KRW50000 };
-enum class TransactionType { DEPOSIT, WITHDRAWAL, TRANSFER };
+enum class ATMType { SingleBank, MultiBank };
+enum class Language { English, Korean };
+enum class SessionState { Idle, Active, Error };
 
-class Card;
-class Session;
-class Transaction;
+struct Transaction {
+    static int nextTransactionId;
+    int transactionId;
+    std::string type;
+    double amount;
+    std::string timestamp;
+    
+    Transaction(std::string t, double a);
+};
+
+class Session {
+private:
+    Account* activeAccount;
+    std::vector<Transaction> transactions;
+    SessionState state;
+
+public:
+    Session();
+    void addTransaction(const Transaction& trans);
+    void printSummary() const;
+    SessionState getState() const { return state; }
+};
 
 class ATM {
 private:
-    std::string serialNumber;
+    int serialNumber;
     ATMType type;
-    Language language;
-    std::string primaryBank;
-    std::map<CashType, int> availableCash;
+    bool isBilingual;
+    Bank* primaryBank;
+    std::vector<Bank*> supportedBanks;
+    Session* currentSession;
+    Language currentLanguage;
 
 public:
-    ATM(std::string sn, ATMType t, Language lang, std::string pBank)
-        : serialNumber(sn), type(t), language(lang), primaryBank(pBank) {
-        // Initialize available cash to 0
-        availableCash[CashType::KRW_1000] = 0;
-        availableCash[CashType::KRW_5000] = 0;
-        availableCash[CashType::KRW_10000] = 0;
-        availableCash[CashType::KRW_50000] = 0;
-    }
+    ATM(int serial, ATMType atmType, bool bilingual, Bank* primary);
+    ~ATM();
 
-    void addCash(CashType type, int count) {
-        availableCash[type] += count;
-    }
-
-    std::string getSerialNumber() const { return serialNumber; }
-    ATMType getType() const { return type; }
-    Language getLanguage() const { return language; }
-    std::map<CashType, int> getCashStatus() const { return availableCash; }
-    std::string getPrimaryBank() const { return primaryBank; }
+    bool insertCard(Account* account);
+    bool endSession();
+    bool validateCard(Account* account) const;
+    void displayMessage(const std::string& msg);
+    void setLanguage(Language lang);
+    
+    // Transaction operations
+    bool deposit(double amount);
+    bool withdraw(double amount);
+    bool transfer(Account* target, double amount);
 };
 
-
-#endif // ATM_H
+#endif
 

@@ -1,5 +1,7 @@
 #include <iostream>
 #include <string>
+#include "account.h"
+#include "bank.h"
 
 using namespace std;
 
@@ -26,6 +28,8 @@ public:
 	void createaccount();//account에 맞춰서 짜야함
 	void printbankaccount();//account에 맞춰서 짜야함
 	int* depositcashtoatm(int amount);//deposit cashes to an atm to serve user(각 지폐 단위로)
+	Account* createAccount(std::string name, int accountNumber, double initialBalance);
+	Account* getAccount(int accountNumber) const;
 };
 
 Bank::Bank(string name) {
@@ -49,9 +53,29 @@ void Bank::createaccount() {
 	}
 }
 
+Account* Bank::createAccount(std::string name, int accountNumber, double initialBalance) {
+    if (numaccounts >= 1000) return nullptr;
+    
+    accounts[numaccounts] = new Account(name, accountNumber, initialBalance, bankname);
+    numaccounts++;
+    return accounts[numaccounts - 1];
+}
+
+Account* Bank::getAccount(int accountNumber) const {
+    for (int i = 0; i < numaccounts; i++) {
+        if (accounts[i]->getAccNumber() == accountNumber) {
+            return accounts[i];
+        }
+    }
+    return nullptr;
+}
+
 void Bank::printbankaccount() {
 	for (int i = 0; i < numaccounts; i++) {
-		cout << "Bank: " << bankname << ", Username: " << endl;//username, account number, available fund, transaction history
+		cout << "Bank: " << bankname 
+             << ", Username: " << accounts[i]->getAccName()
+             << ", Account: " << accounts[i]->getAccNumber()
+             << ", Balance: " << accounts[i]->getBalance() << endl;
 	}
 }
 

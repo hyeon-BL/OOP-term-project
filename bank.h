@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <string>
+#include "account.h"
 
 using namespace std;
 
@@ -30,6 +31,9 @@ public:
     int getwfee() const { return wfee; }
     int getafee() const { return afee; }
     int getcfee() const { return cfee; }
+    std::string getbankname() const { return bankname; }
+    Account* getAccount(int accountNumber) const;
+    Account* createAccount(std::string name, int accountNumber, double initialBalance = 0.0);
 
     void createaccount();       // Creates a new account
     void printbankaccount() const;  // Prints account details
