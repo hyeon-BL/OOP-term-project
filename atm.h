@@ -50,7 +50,7 @@ private:
     double atmCashBalance;
     int withdrawalCount;
     static const int MAX_WITHDRAWAL_COUNT = 3;
-    static const double MAX_WITHDRAWAL_AMOUNT;
+    static const double MAX_WITHDRAWAL_AMOUNT; // Remove constexpr and initialization
     static const int MAX_CASH_INPUT = 50;
     static const int MAX_CHECK_COUNT = 30;
 

@@ -1,6 +1,10 @@
 #include "atm.h"
 #include <ctime>
 
+const double ATM::MAX_WITHDRAWAL_AMOUNT = 500000.0;
+// Define static constants
+// const double ATM::MAX_WITHDRAWAL_AMOUNT = 500000.0;
+
 int Transaction::nextTransactionId = 1;
 
 Transaction::Transaction(std::string t, double a) : type(t), amount(a) {

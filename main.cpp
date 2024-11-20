@@ -6,47 +6,101 @@
 #include "atm.h"
 #include "bank.h"
 #include "account.h"
+#include <functional>
+
+void runTest(const std::string& testName, std::function<void()> testCase) {
+    std::cout << "\n=== Running Test: " << testName << " ===" << std::endl;
+    try {
+        testCase();
+        std::cout << "Test completed successfully" << std::endl;
+    } catch (const std::exception& e) {
+        std::cout << "Test failed: " << e.what() << std::endl;
+    }
+}
 
 int main() {
-    try {
-        std::cout << "=== ATM System Test Cases ===" << std::endl;
-        
-        // Create a primary bank
-        PrimaryBank* bank = new PrimaryBank("TestBank");
-        
-        // Create ATM instance
-        ATM* atm = new ATM(315785, ATMType::SingleBank, true, bank);
-        
-        // Create test account
-        Account* testAccount = bank->createAccount("John Doe", 12345, 10000.0);
-        
-        // Test ATM operations
-        std::cout << "=== ATM System Test ===" << std::endl;
-        
-        // Insert card and start session
-        if (atm->insertCard(testAccount)) {
-            std::cout << "Card inserted successfully" << std::endl;
-            
-            // Perform transactions
-            if (atm->deposit(5000)) {
-                std::cout << "Deposit successful" << std::endl;
-            }
-            
-            if (atm->withdraw(2000)) {
-                std::cout << "Withdrawal successful" << std::endl;
-            }
-            
-            // End session
-            atm->endSession();
+    // Setup test environment
+    PrimaryBank* primaryBank = new PrimaryBank("TestBank");
+    NonPrimaryBank* otherBank = new NonPrimaryBank("OtherBank");
+    ATM* atm = new ATM(1234, ATMType::SingleBank, true, primaryBank);
+    
+    // Create test accounts
+    Account* primaryAccount = primaryBank->createAccount("John Doe", 12345, 100000.0);
+    Account* otherAccount = otherBank->createAccount("Jane Doe", 67890, 100000.0);
+
+    // Test cases
+    runTest("Card Insertion - Primary Bank", [&]() {
+        if (!atm->insertCard(primaryAccount)) {
+            throw std::runtime_error("Failed to insert valid primary bank card");
         }
+        atm->endSession();
+    });
+
+    runTest("Card Insertion - Other Bank", [&]() {
+        if (atm->insertCard(otherAccount)) {
+            throw std::runtime_error("Accepted card from non-primary bank in SingleBank ATM");
+        }
+    });
+
+    runTest("Cash Deposit Test", [&]() {
+        atm->insertCard(primaryAccount);
+        std::cout << "Testing cash deposit - Follow the prompts:" << std::endl;
+        std::cout << "1. Enter 'money' when asked for deposit type" << std::endl;
+        std::cout << "2. Enter some bills (e.g., 1 50000 bill, 2 10000 bills)" << std::endl;
+        atm->deposit(0); // Amount will be calculated from user input
+        atm->endSession();
+    });
+
+    runTest("Check Deposit Test", [&]() {
+        atm->insertCard(primaryAccount);
+        std::cout << "Testing check deposit - Follow the prompts:" << std::endl;
+        std::cout << "1. Enter 'check' when asked for deposit type" << std::endl;
+        std::cout << "2. Enter number of checks (e.g., 2)" << std::endl;
+        std::cout << "3. Enter amounts for each check" << std::endl;
+        atm->deposit(0); // Amount will be calculated from user input
+        atm->endSession();
+    });
+
+    runTest("Withdrawal Test Series", [&]() {
+        atm->insertCard(primaryAccount);
         
-        // Cleanup
-        delete atm;
-        delete bank;
+        // Test 1: Valid withdrawal
+        std::cout << "Testing valid withdrawal (10000 won)..." << std::endl;
+        if (!atm->withdraw(10000)) {
+            throw std::runtime_error("Failed to withdraw valid amount");
+        }
+
+        // Test 2: Invalid amount (not multiple of 1000)
+        std::cout << "Testing invalid withdrawal amount (1500 won)..." << std::endl;
+        if (atm->withdraw(1500)) {
+            throw std::runtime_error("Accepted invalid withdrawal amount");
+        }
+
+        // Test 3: Withdrawal limit test
+        std::cout << "Testing withdrawal limit..." << std::endl;
+        atm->withdraw(10000);
+        atm->withdraw(10000);
+        atm->withdraw(10000); // This should be rejected (4th attempt)
         
-        return 0;
-    } catch (const std::exception& e) {
-        std::cerr << "Error occurred during testing: " << e.what() << std::endl;
-        return 1;
-    }
+        atm->endSession();
+    });
+
+    runTest("Session Management Test", [&]() {
+        // Test double session start
+        if (!atm->insertCard(primaryAccount)) {
+            throw std::runtime_error("Failed to start first session");
+        }
+        if (atm->insertCard(primaryAccount)) {
+            throw std::runtime_error("Allowed second session while first was active");
+        }
+        atm->endSession();
+    });
+
+    // Cleanup
+    delete atm;
+    delete primaryBank;
+    delete otherBank;
+
+    std::cout << "\nAll tests completed." << std::endl;
+    return 0;
 }
