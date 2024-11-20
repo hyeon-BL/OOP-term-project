@@ -47,6 +47,12 @@ private:
     std::vector<Bank*> supportedBanks;
     Session* currentSession;
     Language currentLanguage;
+    double atmCashBalance;
+    int withdrawalCount;
+    static const int MAX_WITHDRAWAL_COUNT = 3;
+    static const double MAX_WITHDRAWAL_AMOUNT; // Remove constexpr and initialization
+    static const int MAX_CASH_INPUT = 50;
+    static const int MAX_CHECK_COUNT = 30;
 
 public:
     ATM(int serial, ATMType atmType, bool bilingual, Bank* primary);
@@ -62,6 +68,8 @@ public:
     bool deposit(double amount);
     bool withdraw(double amount);
     bool transfer(Account* target, double amount);
+    double getAtmCashBalance() const { return atmCashBalance; }
+    void setAtmCashBalance(double amount) { atmCashBalance = amount; }
 };
 
 #endif
