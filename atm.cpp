@@ -57,6 +57,7 @@ bool ATM::insertCard(Account* account) {
     }
     
     currentSession = new Session();
+    currentSession->setActiveAccount(account);
     displayMessage("Card accepted. Welcome!");
     return true;
 }

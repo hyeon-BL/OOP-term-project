@@ -24,7 +24,7 @@ protected:
 
 public:
     Bank(string bankname);
-    virtual ~Bank();  // Virtual destructor for inheritance
+    virtual ~Bank();  // Remove =default and provide implementation
 
     bool getisprimarybank() const { return isprimarybank; }
     int getdfee() const { return dfee; }
@@ -35,7 +35,7 @@ public:
     Account* getAccount(int accountNumber) const;
     Account* createAccount(std::string name, int accountNumber, double initialBalance = 0.0);
 
-    void createaccount();       // Creates a new account
+    void createaccount(std::string name, int number, double balance);  // Updated signature
     void printbankaccount() const;  // Prints account details
     int* depositcashtoatm(int amount);  // Deposits cash to ATM by denomination
 };
@@ -44,13 +44,13 @@ public:
 class PrimaryBank : public Bank {
 public:
     PrimaryBank(string name);
-    ~PrimaryBank() override;
+    ~PrimaryBank() override = default;  // Use default since no special cleanup needed
 };
 
 class NonPrimaryBank : public Bank {
 public:
     NonPrimaryBank(string name);
-    ~NonPrimaryBank() override;
+    ~NonPrimaryBank() override = default;  // Use default since no special cleanup needed
 };
 
 #endif // BANK_H

@@ -31,6 +31,11 @@ public:
     void addTransaction(const Transaction& trans);
     void printSummary() const;
     SessionState getState() const { return state; }
+    Account* getActiveAccount() const { return activeAccount; }
+    void setActiveAccount(Account* account) { 
+        activeAccount = account;
+        state = SessionState::Active;
+    }
 };
 
 class ATM {
