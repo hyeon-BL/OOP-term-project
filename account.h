@@ -4,27 +4,35 @@
 #include <string>
 #include <vector>
 
+using namespace std;
+
 class Account {
 private:
-    std::string accName;
-    int accNumber;
-    double balance;
-    std::string bankName;
-    std::vector<std::string> transactionHistory;
+    string accName;                   // 계좌 이름
+    int accNumber;                    // 계좌 번호
+    int password;                     // 계좌 비밀번호
+    int accbalance;                   // 계좌 잔액
+    string bankName;                  // 은행 이름
+    vector<string> transactionHistory; // 거래 내역
 
 public:
-    Account(std::string name, int number, double initialBalance = 0.0, std::string bank = "");
+    // 생성자와 소멸자
+    Account(string name, int number, int password, int initialBalance = 0);
     ~Account();
 
-    std::string getAccName() const;
+    // Getter 메서드
+    string getAccName() const;
     int getAccNumber() const;
-    double getBalance() const;
-    std::string getBankName() const { return bankName; }
-    std::vector<std::string> getTransactionHistory() const;
+    int getBalance() const;
+    string getBankName() const;
+    vector<string> getTransactionHistory() const;
 
-    void deposit(double amount);
-    bool withdraw(double amount);
-    void addTransaction(const std::string& transaction);
+    // 계좌 기능
+    bool verifyPassword(int inputPassword) const; // 비밀번호 확인
+    void deposit(int amount);                     // 입금
+    bool withdraw(int amount);                    // 출금
+    void addTransaction(const string& transaction); // 거래 내역 추가
+    void setBankName(const string& bank);         // 은행 이름 설정
 };
 
-#endif
+#endif // ACCOUNT_H

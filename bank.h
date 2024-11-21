@@ -1,43 +1,28 @@
-// bank.h
-
 #ifndef BANK_H
 #define BANK_H
 
-#include <iostream>
 #include <string>
-#include "account.h"
-
-using namespace std;
-
-class Account;  // Forward declaration of Account class
+#include "Account.h" // Account 클래스 선언 포함
 
 class Bank {
 protected:
-    string bankname;
-    Account* accounts[1000]; // Array to hold pointers to Account objects
-    int numaccounts;         // Number of accounts in the bank
-    bool isprimarybank;      // Specifies if the bank is a primary bank
-    int dfee;                // Deposit fee
-    int wfee;                // Withdrawal fee
-    int afee;                // Account transfer fee
-    int cfee;                // Cash transfer fee
+    std::string bankname; // 은행 이름
+    Account* accounts[1000]; // 최대 1000개의 계좌
+    int numaccounts; // 현재 계좌 수
 
 public:
     Bank(string bankname);
-    virtual ~Bank();  // Remove =default and provide implementation
+    ~Bank();  // Remove =default and provide implementation
 
     void setisprimarybank(bool isprimary);
     bool getisprimarybank() const { return isprimarybank; }
-    int getdfee() const { return dfee; }
-    int getwfee() const { return wfee; }
-    int getafee() const { return afee; }
-    int getcfee() const { return cfee; }
     std::string getbankname() const { return bankname; }
     Account* getAccount(int accountNumber) const;
-    Account* createAccount(std::string name, int accountNumber, double initialBalance = 0.0);
+    Account* createAccount(std::string name, int accountNumber, int password, int initialBalance = 0);
 
-    void createaccount(std::string name, int number, double balance);  // Updated signature
+    void createaccount(std::string name, int number, int accbalance, int password);  // Updated signature
     void printbankaccount() const;  // Prints account details
-    int* depositcashtoatm(int amount);  // Deposits cash to ATM by denomination
 };
+
+
 #endif // BANK_H
