@@ -1,56 +1,30 @@
-// bank.h
-
 #ifndef BANK_H
 #define BANK_H
 
-#include <iostream>
 #include <string>
-#include "account.h"
-
-using namespace std;
-
-class Account;  // Forward declaration of Account class
+#include "Account.h" // Account 클래스 선언 포함
 
 class Bank {
 protected:
-    string bankname;
-    Account* accounts[1000]; // Array to hold pointers to Account objects
-    int numaccounts;         // Number of accounts in the bank
-    bool isprimarybank;      // Specifies if the bank is a primary bank
-    int dfee;                // Deposit fee
-    int wfee;                // Withdrawal fee
-    int afee;                // Account transfer fee
-    int cfee;                // Cash transfer fee
+    std::string bankname; // 은행 이름
+    Account* accounts[1000]; // 최대 1000개의 계좌
+    int numaccounts; // 현재 계좌 수
 
 public:
-    Bank(string bankname);
-    virtual ~Bank();  // Remove =default and provide implementation
+    // 생성자와 소멸자
+    Bank(std::string bankname);
+    ~Bank();
 
-    bool getisprimarybank() const { return isprimarybank; }
-    int getdfee() const { return dfee; }
-    int getwfee() const { return wfee; }
-    int getafee() const { return afee; }
-    int getcfee() const { return cfee; }
-    std::string getbankname() const { return bankname; }
+    // 은행 정보 가져오기
+    std::string getbankname() const;
+
+    // 계좌 관련 메서드
     Account* getAccount(int accountNumber) const;
-    Account* createAccount(std::string name, int accountNumber, double initialBalance = 0.0);
+    Account* createAccount(std::string name, int accountNumber, int password, int initialBalance = 0);
+    void createaccount(std::string name, int number, int balance, int password);
 
-    void createaccount(std::string name, int number, double balance);  // Updated signature
-    void printbankaccount() const;  // Prints account details
-    int* depositcashtoatm(int amount);  // Deposits cash to ATM by denomination
-};
-
-// Derived classes
-class PrimaryBank : public Bank {
-public:
-    PrimaryBank(string name);
-    ~PrimaryBank() override = default;  // Use default since no special cleanup needed
-};
-
-class NonPrimaryBank : public Bank {
-public:
-    NonPrimaryBank(string name);
-    ~NonPrimaryBank() override = default;  // Use default since no special cleanup needed
+    // 은행의 모든 계좌 정보 출력
+    void printbankaccount() const;
 };
 
 #endif // BANK_H
