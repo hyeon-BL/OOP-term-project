@@ -26,6 +26,7 @@ public:
     Bank(string bankname);
     virtual ~Bank();  // Remove =default and provide implementation
 
+    void setisprimarybank(bool isprimary);
     bool getisprimarybank() const { return isprimarybank; }
     int getdfee() const { return dfee; }
     int getwfee() const { return wfee; }
@@ -39,18 +40,4 @@ public:
     void printbankaccount() const;  // Prints account details
     int* depositcashtoatm(int amount);  // Deposits cash to ATM by denomination
 };
-
-// Derived classes
-class PrimaryBank : public Bank {
-public:
-    PrimaryBank(string name);
-    ~PrimaryBank() override = default;  // Use default since no special cleanup needed
-};
-
-class NonPrimaryBank : public Bank {
-public:
-    NonPrimaryBank(string name);
-    ~NonPrimaryBank() override = default;  // Use default since no special cleanup needed
-};
-
 #endif // BANK_H

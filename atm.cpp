@@ -31,11 +31,17 @@ void Session::printSummary() const {
     }
 }
 
-ATM::ATM(int serial, ATMType atmType, bool bilingual, Bank* primary) 
+ATM::ATM(int serial, ATMType atmType, bool bilingual, Bank* primary, const std::vector<Bank*>& banks) // ATM(시리얼, ATM타입, 다국어지원여부, 기본은행, 은행목록)
     : serialNumber(serial), type(atmType), isBilingual(bilingual), 
       primaryBank(primary), currentSession(nullptr), 
       currentLanguage(Language::English) {
-    supportedBanks.push_back(primary);
+    
+    primaryBank->setisprimarybank(true); // Set primary bank flag
+    if (type == ATMType::MultiBank) { // MultiBank ATM supports all banks
+        for (auto bank : banks) {
+            supportedBanks.push_back(bank);
+        }
+    }
 }
 
 ATM::~ATM() {

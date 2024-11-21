@@ -3,6 +3,7 @@
 #include <iostream>
 
 Bank::Bank(std::string name) : bankname(name), numaccounts(0) {
+    setisprimarybank(false);
     for (int i = 0; i < 1000; i++) {
         accounts[i] = nullptr;
     }
@@ -12,6 +13,14 @@ Bank::~Bank() {
     for (int i = 0; i < numaccounts; i++) {
         delete accounts[i];
     }
+}
+
+void Bank::setisprimarybank(bool isprimary) {
+    isprimarybank = isprimary;
+    dfee = isprimary ? 1000 : 2000;
+    wfee = isprimary ? 500 : 1000;
+    afee = isprimary ? 500 : 1000;
+    cfee = isprimary ? 1000 : 2000;
 }
 
 void Bank::createaccount(std::string name, int number, double balance) {
@@ -58,18 +67,4 @@ int* Bank::depositcashtoatm(int amount) {
     return result;
 }
 
-PrimaryBank::PrimaryBank(std::string name) : Bank(name) {
-    isprimarybank = true;
-    dfee = 1000;
-    wfee = 1000;
-    afee = 2000;
-    cfee = 1000;
-}
 
-NonPrimaryBank::NonPrimaryBank(std::string name) : Bank(name) {
-    isprimarybank = false;
-    dfee = 2000;
-    wfee = 2000;
-    afee = 3000;
-    cfee = 1000;
-}

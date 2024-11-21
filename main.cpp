@@ -2,15 +2,18 @@
 #include "bank.h"
 #include "account.h"
 #include <iostream>
+#include <vector>
+
+using namespace std;
 
 int main() {
     // Create banks
-    PrimaryBank wooriBank("Woori Bank");
-    NonPrimaryBank shinhanBank("Shinhan Bank");
-    
+    Bank wooriBank("Woori Bank");
+    Bank shinhanBank("Shinhan Bank");
+    vector<Bank*> banks = {&wooriBank, &shinhanBank};
     // Create ATMs
-    ATM singleBankATM(1001, ATMType::SingleBank, false, &wooriBank);  // Only accepts Woori Bank cards
-    ATM multiBankATM(1002, ATMType::MultiBank, true, &wooriBank);     // Accepts all bank cards
+    ATM singleBankATM(1001, ATMType::SingleBank, false, &wooriBank, banks);  // Only accepts Woori Bank cards
+    ATM multiBankATM(1002, ATMType::MultiBank, true, &wooriBank, banks);     // Accepts all bank cards
     
     // Create accounts in different banks
     Account* wooriAcc1 = wooriBank.createAccount("John Doe", 1001, 1000000);
