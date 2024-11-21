@@ -55,7 +55,7 @@ private:
     static const int MAX_CHECK_COUNT = 30;
 
 public:
-    ATM(int serial, ATMType atmType, bool bilingual, Bank* primary);
+    ATM(int serial, ATMType atmType, bool bilingual, Bank* primary, const std::vector<Bank*>& banks);
     ~ATM();
 
     bool insertCard(Account* account);

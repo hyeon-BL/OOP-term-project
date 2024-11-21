@@ -3,8 +3,8 @@
 #include <iostream>
 
 using namespace std;
-
-Bank::Bank(string name) : bankname(name), numaccounts(0) {
+Bank::Bank(std::string name) : bankname(name), numaccounts(0) {
+    setisprimarybank(false);
     for (int i = 0; i < 1000; i++) {
         accounts[i] = nullptr;
     }
@@ -16,9 +16,17 @@ Bank::~Bank() {
     }
 }
 
-void Bank::createaccount(string name, int number, int balance, int password) {
+void Bank::setisprimarybank(bool isprimary) {
+    isprimarybank = isprimary;
+    dfee = isprimary ? 1000 : 2000;
+    wfee = isprimary ? 500 : 1000;
+    afee = isprimary ? 500 : 1000;
+    cfee = isprimary ? 1000 : 2000;
+}
+
+void Bank::createaccount(string name, int accnumber, int balance, int password) {
     if (numaccounts < 1000) {
-        accounts[numaccounts] = new Account(name, number, password, balance);
+        accounts[numaccounts] = new Account(name, accnumber, password, balance);
         accounts[numaccounts]->setBankName(bankname);
         numaccounts++;
     }

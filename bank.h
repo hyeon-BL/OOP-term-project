@@ -11,20 +11,18 @@ protected:
     int numaccounts; // 현재 계좌 수
 
 public:
-    // 생성자와 소멸자
-    Bank(std::string bankname);
-    ~Bank();
+    Bank(string bankname);
+    ~Bank();  // Remove =default and provide implementation
 
-    // 은행 정보 가져오기
-    std::string getbankname() const;
-
-    // 계좌 관련 메서드
+    void setisprimarybank(bool isprimary);
+    bool getisprimarybank() const { return isprimarybank; }
+    std::string getbankname() const { return bankname; }
     Account* getAccount(int accountNumber) const;
     Account* createAccount(std::string name, int accountNumber, int password, int initialBalance = 0);
-    void createaccount(std::string name, int number, int balance, int password);
 
-    // 은행의 모든 계좌 정보 출력
-    void printbankaccount() const;
+    void createaccount(std::string name, int number, int accbalance, int password);  // Updated signature
+    void printbankaccount() const;  // Prints account details
 };
+
 
 #endif // BANK_H
