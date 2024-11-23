@@ -67,7 +67,7 @@ public:
     void setLanguage(Language lang);
     
     // Transaction operations
-    void deposit(double amount);
+    void deposit();
     void withdraw(double amount);
     bool transfer(Account* target, double amount);
     double getAtmCashBalance() const { return atmCashBalance; }
