@@ -40,13 +40,13 @@ public:
 
 class ATM {
 private:
-    int serialNumber; //ATM 번호 
-    ATMType type; //ATM타입 
-    bool isBilingual;//ATM 지원 언어 
-    Bank* primaryBank;//ATM의 primary bank 
-    std::vector<Bank*> supportedBanks;//가능한 은행 
+    int serialNumber;
+    ATMType type;
+    bool isBilingual;
+    Bank* primaryBank;
+    std::vector<Bank*> supportedBanks;
     Session* currentSession;
-    Language currentLanguage;// 지원 언어 
+    Language currentLanguage;
     double atmCashBalance;
     int withdrawalCount;
     static const int MAX_WITHDRAWAL_COUNT = 3;
@@ -62,11 +62,15 @@ public:
     bool endSession();
     bool validateCard(Account* account) const;
     void displayMessage(const std::string& msg);
-    bool setLanguage;
+    void setLanguage(Language lang);
     
     // Transaction operations
-    void deposit(double amount);
-    void withdraw(double amount);
+    bool deposit(double amount);
+    bool withdraw(double amount);
     bool transfer(Account* target, double amount);
     double getAtmCashBalance() const { return atmCashBalance; }
     void setAtmCashBalance(double amount) { atmCashBalance = amount; }
+};
+
+#endif
+
