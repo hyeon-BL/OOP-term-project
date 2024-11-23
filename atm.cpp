@@ -71,7 +71,7 @@ void ATM::readCardinfo(){//카드 정보 확인
 			break 
 			
 	if (!valid) { // 계좌를 찾지 못한 경우
-        if (isEnglish)
+        if (isEnglish)////뒤로 미루기기
             cout << "Error: No account found, returning card\n" << endl;
         else
             cout << "오류: 존재하지 않는 계좌입니다. 카드를 반환하겠습니다\n" << endl;
@@ -165,10 +165,6 @@ bool ATM::validateCard(Account* account) const {
     return true; // MultiBank ATM accepts all cards
 }
 
-void ATM::displayMessage(const std::string& msg) {
-    // In a real implementation, this would handle bilingual support
-    std::cout << msg << std::endl;
-}
 
 void ATM::setLanguage(Language lang) {// 언어 선택 
     if (!isBilingual && lang != Language::English) {
@@ -241,7 +237,7 @@ void ATM::deposit(double amount) {
     
     std::cout << "입금 수수료: " << fee << std::endl;
     
-    if (totalAmount > fee) {
+    if (totalAmount > fee) { // 수수료 관련 수정(주력 비주력, 정확한 금액만 받을 수 있음), ATM 반영을 현금은 ATM 돈 추가, 수표는 ATM 돈 추가 X
         account->deposit(totalAmount - fee);
         atmCashBalance += totalAmount;
         Transaction trans("Deposit", totalAmount);
@@ -268,10 +264,6 @@ bool ATM::withdraw(double amount) {
         return false;
     }
 
-    if (static_cast<int>(amount) % 1000 != 0) {// 무조건 1000 이상 입금 가능 
-        std::cout << "Amount must be in multiples of 1000" << std::endl;
-        return false;
-    }
 
     Account* account = currentSession->getActiveAccount();
     if (!account) return false;
@@ -292,7 +284,7 @@ bool ATM::withdraw(double amount) {
         std::cout << "Withdrawal successful" << std::endl;
         return true;
     }
-
+	// 출금 수수료 찾기
     std::cout << "Withdrawal failed - insufficient funds in account" << std::endl; // 계좌 잔액 부족
     return false;
 }
@@ -333,7 +325,7 @@ bool ATM::transfer(Account* target, double amount) {
         }
     }
 	
-	if (transfer_type == 2) {//현금일때 돈 받기 
+	if (transfer_type == 2) {//현금일때 돈 받기 -> 현금일때는 카드를 받지 않기 때문에 이 부분을 초기에 입력받아서 분류, 현금 들어오면 ATM 돈 추가
         int denominations[4];
         const int denominationValues[4] = {50000, 10000, 5000, 1000};
         
@@ -367,7 +359,7 @@ bool ATM::transfer(Account* target, double amount) {
 		total=totlalBills+fee // 수수료 포함 입금 가격
 		cout<<"입금액: "<<totalBills<<"수수료:"<<fee<"합계:"<<total<<"입니다"<<endl; 
 	}
-	else{//계좌간 이체
+	else{//계좌간 이체 -> 출금계좌 입력이 두번 중복될 경우 그냥 수수료만 확인하고 금액 반영가능
 		cout<<"출금할 계좌를 입력하시오"<<endl;
 		string account_out;
 		cin>>account_out;
@@ -394,8 +386,3 @@ bool ATM::transfer(Account* target, double amount) {
 	*usingAccount -= (transfer_money + fee);// 보내는 사람 계좌 차감 
     *transferAccount += transfer_money;// 받는 사람 계좌 잔액 증가 
 }
-	if(transfer_count)
-    if (!currentSession) return false;
-    Transaction trans("Transfer", amount);
-    currentSession->addTransaction(trans);
-    return true;
