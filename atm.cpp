@@ -325,7 +325,7 @@ void ATM::deposit() {//언어 두개
     std::cout << "입금 수수료: " << fee << std::endl;
     int additionalfee=0;
     int totalfee = 0;
-    while (totalfee < fee) {
+    while (totalfee < fee) { // 수수료가 충분하지 않은 경우(수수료를 넘는 경우 고려x)
         cout << "수수료를 넣어주세요." << totalfee << "/" << fee<<"\n";
         cin >> additionalfee;
         totalfee += additionalfee;

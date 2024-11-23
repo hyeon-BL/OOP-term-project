@@ -28,12 +28,19 @@ int main() {
 
     // ATM 동작 테스트
     atm1.atmstart();
+    atm1.deposit();
+    myBank.printbankaccount();
+    atm1.withdraw(1000);
+    myBank.printbankaccount();
 
 
     // 동적 메모리 해제
     delete adminAccount;
 
     return 0;
+    //Session이란 무엇인가. 
+    //account transfer fee가 2000, 3000, 4000임. 
+    //start에서 deposit, withdraw, transfer 선택해서 메서드 호출해야할거같음
 }
 // int main() {
 //     // Create a bank
