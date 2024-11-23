@@ -22,6 +22,7 @@ public:
 
     void createaccount(std::string name, int number, int accbalance, int password);  // Updated signature
     void printbankaccount() const;  // Prints account details
+    std::string Bank
 };
 
 
