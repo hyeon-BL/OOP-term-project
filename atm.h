@@ -20,6 +20,7 @@ struct Transaction {
     Transaction(std::string t, double a);
 };
 
+
 class Session {
 private:
     Account* activeAccount;
@@ -58,11 +59,12 @@ public:
     ATM(int serial, ATMType atmType, bool bilingual, Bank* primary, const std::vector<Bank*>& banks);
     ~ATM();
 
+    int atmstart();
+    void readCardInfo(int accNum);
     bool insertCard(Account* account);
     bool endSession();
     bool validateCard(Account* account) const;
-    void displayMessage(const std::string& msg);
-    bool setLanguage;
+    void setLanguage(Language lang);
     
     // Transaction operations
     void deposit(double amount);
@@ -70,3 +72,6 @@ public:
     bool transfer(Account* target, double amount);
     double getAtmCashBalance() const { return atmCashBalance; }
     void setAtmCashBalance(double amount) { atmCashBalance = amount; }
+};
+
+#endif // ATM_H

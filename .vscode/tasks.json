@@ -10,7 +10,7 @@
                 "/nologo",
                 "/Fe${workspaceFolder}\\main.exe",
                 "${workspaceFolder}\\main.cpp",
-                // "${workspaceFolder}\\atm.cpp",
+                "${workspaceFolder}\\atm.cpp",
                 "${workspaceFolder}\\Account.cpp",
                 "${workspaceFolder}\\bank.cpp"
             ],

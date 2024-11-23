@@ -22,6 +22,10 @@ public:
     void setisprimarybank(bool isprimary);
     bool getisprimarybank() const { return isprimarybank; }
     string getbankname() const;
+    int getdfee() const { return dfee; }
+    int getwfee() const { return wfee; }
+    int getafee() const { return afee; }
+    int getcfee() const { return cfee; }
     Account* getAccount(int accountNumber) const;
     Account* createAccount(std::string name, int accountNumber, int password, int initialBalance = 0);
 
