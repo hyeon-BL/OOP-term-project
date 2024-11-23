@@ -28,17 +28,19 @@ void Bank::setisprimarybank(bool isprimary) {
 
 void Bank::createaccount(string name, int accnumber, int balance, int password) {
     if (numaccounts < 1000) {
-        accounts[numaccounts] = new Account(name, accnumber, password, balance);
-        accounts[numaccounts]->setBankName(bankname);
+        accounts[numaccounts] = new normalAccount(this, name, accnumber, password, balance);
         numaccounts++;
     }
 }
 
+string Bank::getbankname() const {
+    return bankname;
+}
+
 Account* Bank::createAccount(string name, int accountNumber, int password, int initialBalance) {
     if (numaccounts >= 1000) return nullptr;
-
-    accounts[numaccounts] = new Account(name, accountNumber, password, initialBalance);
-    accounts[numaccounts]->setBankName(bankname);
+    
+    accounts[numaccounts] = new normalAccount(this, name, accountNumber, password, initialBalance);
     numaccounts++;
     return accounts[numaccounts - 1];
 }
