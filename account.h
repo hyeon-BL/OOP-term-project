@@ -45,20 +45,11 @@ public:
     bool isAdmincheck() const override;		
 };
 
-normalAccount::normalAccount(Bank* bank, string name, int number, int password, int accbalance) : Account(name, number, password, accbalance) {
-    this->bankName = bank;
-    this->isAdmin = false;
-}
-
 
 class admin : public Account{
 public:
 	admin(Bank* bank, string name, int number, int password);  // Fix parameter type
     bool isAdmincheck() const; // Add const
 };
-admin::admin(Bank* bank, string name, int number, int password) : Account(name, number, password) {
-    this->bankName = bank;
-    this->isAdmin = true;
-}
 
 #endif
