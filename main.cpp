@@ -4,122 +4,133 @@
 #include <map>
 #include <memory>
 #include "atm.h"
-#include "bank.h"
+#include "bank.h" // Ensure this header file defines the Bank class
 #include "account.h"
 #include <functional>
 
-void runTest(const std::string& testName, std::function<void()> testCase) {
-    std::cout << "\n=== Running Test: " << testName << " ===" << std::endl;
-    try {
-        testCase();
-        std::cout << "Test completed successfully" << std::endl;
-    } catch (const std::exception& e) {
-        std::cout << "Test failed: " << e.what() << std::endl;
-    }
-}
-
-
-//bank, account 연결 확인용
-//수수료 정의해둔거 있으니까 필요하면 말하셈. atm 완성되면 초기 atm에 지폐 넣어두는것도 있긴함.
 int main() {
     // 은행 생성
     Bank myBank("DaeguBank");
 
-    // 계좌 생성 
+    // 다른 은행 생성 (MultiBank ATM용)
+    Bank secondBank("SeoulBank");
+
+    // 계좌 생성
     myBank.createAccount("Alice", 1001, 1234, 0); // 사용자 이름, 계좌번호, 비밀번호, 계좌금액
     myBank.createAccount("Bob", 1002, 5678, 0);
 
-    // 초기 계좌 정보 출력
-    cout << "Initial Account Information:" << endl;
+    // 관리자 계좌 생성
+    admin* adminAccount = new admin(&myBank, "AdminUser", 9999, 4321);
+
+    // ATM 생성
+    std::vector<Bank*> supportedBanks = { &myBank, &secondBank };
+    ATM atm1(101, ATMType::MultiBank, true, &myBank, supportedBanks);
+
+    // ATM 동작 테스트
+    atm1.atmstart();
+    atm1.deposit();
+    myBank.printbankaccount();
+    atm1.withdraw(1000);
     myBank.printbankaccount();
 
+
+    // 동적 메모리 해제
+    delete adminAccount;
+
     return 0;
+    //Session이란 무엇인가. 
+    //account transfer fee가 2000, 3000, 4000임. 
+    //start에서 deposit, withdraw, transfer 선택해서 메서드 호출해야할거같음
 }
+// int main() {
+//     // Create a bank
+//     Bank myBank("DaeguBank");
+//     myBank.setisprimarybank(true);
 
+//     cout << "=== Creating Regular Accounts ===" << endl;
+//     myBank.createAccount("Alice", 1001, 1234, 5000);
+//     myBank.createAccount("Bob", 1002, 5678, 3000);
 
-int main() {
-    // Setup test environment
-    PrimaryBank* primaryBank = new PrimaryBank("TestBank");
-    NonPrimaryBank* otherBank = new NonPrimaryBank("OtherBank");
-    ATM* atm = new ATM(1234, ATMType::SingleBank, true, primaryBank);
+//     cout << "\n=== Creating Admin Account ===" << endl;
+//     admin* bankAdmin = new admin(&myBank, "Admin1", 9999, 0000);
     
-    // Create test accounts
-    Account* primaryAccount = primaryBank->createAccount("John Doe", 12345, 100000.0);
-    Account* otherAccount = otherBank->createAccount("Jane Doe", 67890, 100000.0);
+//     cout << "\n=== Testing Admin Status ===" << endl;
+//     cout << "Is Admin1 an admin? " << (bankAdmin->isAdmincheck() ? "Yes" : "No") << endl;
+//     cout << "Is Alice an admin? " << (myBank.getAccount(1001)->isAdmincheck() ? "Yes" : "No") << endl;
 
-    // Test cases
-    runTest("Card Insertion - Primary Bank", [&]() {
-        if (!atm->insertCard(primaryAccount)) {
-            throw std::runtime_error("Failed to insert valid primary bank card");
-        }
-        atm->endSession();
-    });
+//     cout << "\n=== Regular Account Operations ===" << endl;
+//     Account* aliceAccount = myBank.getAccount(1001);
+//     if (aliceAccount) {
+//         aliceAccount->deposit(2000);
+//         cout << "Alice's balance after deposit: " << aliceAccount->getBalance() << endl;
+//     }
 
-    runTest("Card Insertion - Other Bank", [&]() {
-        if (atm->insertCard(otherAccount)) {
-            throw std::runtime_error("Accepted card from non-primary bank in SingleBank ATM");
-        }
-    });
+//     cout << "\n=== Admin Account Operations ===" << endl;
+//     if (bankAdmin) {
+//         // Admin specific operations could be added here
+//         cout << "Admin account number: " << bankAdmin->getAccNumber() << endl;
+//         cout << "Admin verification test: " << bankAdmin->verifyPassword(0000) << endl;
+//     }
 
-    runTest("Cash Deposit Test", [&]() {
-        atm->insertCard(primaryAccount);
-        std::cout << "Testing cash deposit - Follow the prompts:" << std::endl;
-        std::cout << "1. Enter 'money' when asked for deposit type" << std::endl;
-        std::cout << "2. Enter some bills (e.g., 1 50000 bill, 2 10000 bills)" << std::endl;
-        atm->deposit(0); // Amount will be calculated from user input
-        atm->endSession();
-    });
+//     cout << "\n=== Final Account Information ===" << endl;
+//     myBank.printbankaccount();
 
-    runTest("Check Deposit Test", [&]() {
-        atm->insertCard(primaryAccount);
-        std::cout << "Testing check deposit - Follow the prompts:" << std::endl;
-        std::cout << "1. Enter 'check' when asked for deposit type" << std::endl;
-        std::cout << "2. Enter number of checks (e.g., 2)" << std::endl;
-        std::cout << "3. Enter amounts for each check" << std::endl;
-        atm->deposit(0); // Amount will be calculated from user input
-        atm->endSession();
-    });
+//     // Cleanup
+//     delete bankAdmin;
+//     return 0;
+// }
 
-    runTest("Withdrawal Test Series", [&]() {
-        atm->insertCard(primaryAccount);
+
+//bank, account 연결 확인용
+//수수료 정의해둔거 있으니까 필요하면 말하셈. atm 완성되면 초기 atm에 지폐 넣어두는것도 있긴함.
+// int main() {
+//     // Create a bank
+//     Bank myBank("DaeguBank");
+//     myBank.setisprimarybank(true); // Set as primary bank for lower fees
+
+//     cout << "=== Creating Accounts ===" << endl;
+//     // Create multiple accounts with initial balances
+//     myBank.createAccount("Alice", 1001, 1234, 5000);
+//     myBank.createAccount("Bob", 1002, 5678, 3000);
+    
+//     cout << "\n=== Initial Account Information ===" << endl;
+//     myBank.printbankaccount();
+
+//     cout << "\n=== Testing Account Operations ===" << endl;
+//     // Get account references
+//     Account* aliceAccount = myBank.getAccount(1001);
+//     Account* bobAccount = myBank.getAccount(1002);
+
+//     if (aliceAccount && bobAccount) {
+//         // Test password verification
+//         cout << "Password verification for Alice (1234): " 
+//              << (aliceAccount->verifyPassword(1234) ? "Success" : "Failed") << endl;
         
-        // Test 1: Valid withdrawal
-        std::cout << "Testing valid withdrawal (10000 won)..." << std::endl;
-        if (!atm->withdraw(10000)) {
-            throw std::runtime_error("Failed to withdraw valid amount");
-        }
+//         // Test deposit
+//         cout << "\nAlice deposits 2000" << endl;
+//         aliceAccount->deposit(2000);
+//         cout << "Alice's new balance: " << aliceAccount->getBalance() << endl;
 
-        // Test 2: Invalid amount (not multiple of 1000)
-        std::cout << "Testing invalid withdrawal amount (1500 won)..." << std::endl;
-        if (atm->withdraw(1500)) {
-            throw std::runtime_error("Accepted invalid withdrawal amount");
-        }
+//         // Test withdrawal
+//         cout << "\nBob withdraws 1000" << endl;
+//         if (bobAccount->withdraw(1000)) {
+//             cout << "Withdrawal successful" << endl;
+//             cout << "Bob's new balance: " << bobAccount->getBalance() << endl;
+//         } else {
+//             cout << "Withdrawal failed" << endl;
+//         }
 
-        // Test 3: Withdrawal limit test
-        std::cout << "Testing withdrawal limit..." << std::endl;
-        atm->withdraw(10000);
-        atm->withdraw(10000);
-        atm->withdraw(10000); // This should be rejected (4th attempt)
+//         // Display final account states
+//         cout << "\n=== Final Account Information ===" << endl;
+//         myBank.printbankaccount();
         
-        atm->endSession();
-    });
+//         // Display transaction history
+//         cout << "\n=== Alice's Transaction History ===" << endl;
+//         vector<string> aliceHistory = aliceAccount->getTransactionHistory();
+//         for (const string& transaction : aliceHistory) {
+//             cout << transaction << endl;
+//         }
+//     }
 
-    runTest("Session Management Test", [&]() {
-        // Test double session start
-        if (!atm->insertCard(primaryAccount)) {
-            throw std::runtime_error("Failed to start first session");
-        }
-        if (atm->insertCard(primaryAccount)) {
-            throw std::runtime_error("Allowed second session while first was active");
-        }
-        atm->endSession();
-    });
-
-    // Cleanup
-    delete atm;
-    delete primaryBank;
-    delete otherBank;
-
-    std::cout << "\nAll tests completed." << std::endl;
-    return 0;
-}
+//     return 0;
+// }

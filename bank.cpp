@@ -4,7 +4,7 @@
 
 using namespace std;
 Bank::Bank(std::string name) : bankname(name), numaccounts(0) {
-	this->bankname = bankname;
+    this->bankname = bankname;
     setisprimarybank(false);
     for (int i = 0; i < 1000; i++) {
         accounts[i] = nullptr;
@@ -17,9 +17,6 @@ Bank::~Bank() {
     }
 }
 
-string Bank::getbankname() const{
-	return bankname; 
-}
 
 void Bank::setisprimarybank(bool isprimary) {
     isprimarybank = isprimary;
@@ -31,17 +28,19 @@ void Bank::setisprimarybank(bool isprimary) {
 
 void Bank::createaccount(string name, int accnumber, int balance, int password) {
     if (numaccounts < 1000) {
-        accounts[numaccounts] = new Account(name, accnumber, password, balance);
-        accounts[numaccounts]->setBankName(bankname);
+        accounts[numaccounts] = new normalAccount(this, name, accnumber, password, balance);
         numaccounts++;
     }
 }
 
+string Bank::getbankname() const {
+    return bankname;
+}
+
 Account* Bank::createAccount(string name, int accountNumber, int password, int initialBalance) {
     if (numaccounts >= 1000) return nullptr;
-
-    accounts[numaccounts] = new Account(name, accountNumber, password, initialBalance);
-    accounts[numaccounts]->setBankName(bankname);
+    
+    accounts[numaccounts] = new normalAccount(this, name, accountNumber, password, initialBalance);
     numaccounts++;
     return accounts[numaccounts - 1];
 }
@@ -65,32 +64,32 @@ void Bank::printbankaccount() const {
     }
 }
 
-normalAccount* Bank :: makeaccount{// 계좌 생성 
-	string accName;
-	int accNumber;
-	int password;
-	if (language = "한국어"){
-		cout<<"사용자 이름을 입력하시오"<<endl;
-		cin >> accName;
-		cout<<"계좌 번호를 입력하시오"<<endl;
-		cin >> accNumber;
-		cout<<"비밀번호를 입력하시오"<<endl;
-		cin >> password;
-	}else{
-		cout<<"input user name"<<endl;
-		cin >> accName;
-		cout<<"input account number"<<endl;
-		cin >> accNumber;
-		cout<<"input password"<<endl;
-		cin >> password;
-	}
-	normalAccount* newaccount;
-	newaccount = new normalAccount(this, accName, accNumver, password);
-	return newaccount
-}
+// normalAccount* Bank :: makeaccount{// 계좌 생성 
+// 	string accName;
+// 	int accNumber;
+// 	int password;
+// 	if (language = "한국어"){
+// 		cout<<"사용자 이름을 입력하시오"<<endl;
+// 		cin >> accName;
+// 		cout<<"계좌 번호를 입력하시오"<<endl;
+// 		cin >> accNumber;
+// 		cout<<"비밀번호를 입력하시오"<<endl;
+// 		cin >> password;
+// 	}else{
+// 		cout<<"input user name"<<endl;
+// 		cin >> accName;
+// 		cout<<"input account number"<<endl;
+// 		cin >> accNumber;
+// 		cout<<"input password"<<endl;
+// 		cin >> password;
+// 	}
+// 	normalAccount* newaccount;
+// 	newaccount = new normalAccount(this, accName, accNumver, password);
+// 	return newaccount
+// }
 
-Admin* Bank::makeadminaccount(string accName, string accNumber){ // 관리자 계좌 생성 
-	Admins* newAdmin
-	newAdmin = new Admin(this, accName, accNumver);
-	return newAdmin;
-}
+// Admin* Bank::makeadminaccount(string accName, string accNumber){ // 관리자 계좌 생성 
+// 	Admins* newAdmin
+// 	newAdmin = new Admin(this, accName, accNumver);
+// 	return newAdmin;
+// }

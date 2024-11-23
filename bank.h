@@ -9,6 +9,11 @@ protected:
     std::string bankname; // 은행 이름
     Account* accounts[1000]; // 최대 1000개의 계좌
     int numaccounts; // 현재 계좌 수
+    bool isprimarybank;
+    int dfee;
+    int wfee;
+    int afee;
+    int cfee;
 
 public:
     Bank(string bankname);
@@ -16,13 +21,17 @@ public:
 
     void setisprimarybank(bool isprimary);
     bool getisprimarybank() const { return isprimarybank; }
-    std::string getbankname() const { return bankname; }
+    string getbankname() const;
+    int getdfee() const { return dfee; }
+    int getwfee() const { return wfee; }
+    int getafee() const { return afee; }
+    int getcfee() const { return cfee; }
     Account* getAccount(int accountNumber) const;
     Account* createAccount(std::string name, int accountNumber, int password, int initialBalance = 0);
 
     void createaccount(std::string name, int number, int accbalance, int password);  // Updated signature
     void printbankaccount() const;  // Prints account details
-    std::string Bank
+    //std::string Bank;
 };
 
 

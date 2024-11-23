@@ -1,4 +1,5 @@
 #include "Account.h"
+#include "Bank.h"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -26,27 +27,30 @@ int Account::getBalance() const {//계좌 잔액 알기
     return accbalance;
 }
 
-Bank* Account::getBankName() const {//계좌 은행 알기 
-    return bankName;
+string Account::getBankName() const {//계좌 은행 알기 
+    return bankName ? bankName->getbankname() : "No Bank";
 }
 
 vector<string> Account::getTransactionHistory() const {//계좌 히스토리 저장 
     return transactionHistory;
 }
 
-bool normalAccount::isAdmincheck(){// 일반계좌에서의 관리자 여부 확인 
-	return isAdmin
+bool Account::isAdmincheck() const {
+    return isAdmin;
 }
 
-bool admin::isAdmincheck(){//관리자 계좌에서 관리자 여부 확인 
-	cout<<"관리자 카드가 삽입이 되었다"<<endl;
-	return isAmdin
-} 
+bool normalAccount::isAdmincheck() const {
+    return false;
+}
+
+bool admin::isAdmincheck() const {
+    cout << "관리자 카드가 삽입이 되었다\n";
+    return true;
+}
 
 bool Account::verifyPassword(int inputPassword) const {// 비밀번호 확인 메서드
     return password == inputPassword;
 }
-
 
 void Account::deposit(int amount) {// 입금 메서드
     if (amount > 0) {
@@ -56,7 +60,6 @@ void Account::deposit(int amount) {// 입금 메서드
         cout << "Invalid deposit amount." << endl;
     }
 }
-
 
 bool Account::withdraw(int amount) {// 출금 메서드
     if (amount > 0 && amount <= accbalance) {
@@ -75,5 +78,16 @@ void Account::addTransaction(const string& transaction) {
 }
 
 // 은행 이름 설정 메서드
-void Account::setBankName(const string& bank) {
-    bankName = bank;
+void Account::setBankName(Bank& bank) {
+    this->bankName = &bank;
+}
+
+
+normalAccount::normalAccount(Bank* bank, string name, int number, int password, int accbalance) : Account(name, number, password, accbalance) {
+    this->bankName = bank;
+    this->isAdmin = false;
+}
+admin::admin(Bank* bank, string name, int number, int password) : Account(name, number, password) {
+    this->bankName = bank;
+    this->isAdmin = true;
+}
