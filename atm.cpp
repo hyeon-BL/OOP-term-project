@@ -266,7 +266,7 @@ bool ATM::validateCard(Account* account) const {
 
 
 // // Update transaction operations
-void ATM::deposit() {
+void ATM::deposit() {//언어 두개
     if (!currentSession) {
         std::cout << "No active session." << std::endl;
     }
@@ -323,56 +323,60 @@ void ATM::deposit() {
         primaryBank->getdfee() : primaryBank->getdfee() * 2;
 
     std::cout << "입금 수수료: " << fee << std::endl;
-
-    if (totalAmount > fee) {
-        account->deposit(totalAmount - fee);
-        atmCashBalance += totalAmount;
-        Transaction trans("Deposit", totalAmount);
-        currentSession->addTransaction(trans);
+    int additionalfee=0;
+    int totalfee = 0;
+    while (totalfee < fee) {
+        cout << "수수료를 넣어주세요." << totalfee << "/" << fee<<"\n";
+        cin >> additionalfee;
+        totalfee += additionalfee;
     }
+    totalAmount += totalfee;
+
+    account->deposit(totalAmount - fee);
+    atmCashBalance += totalAmount;
+    Transaction trans("Deposit", totalAmount);
+    currentSession->addTransaction(trans);//?
+
 }
 
+void ATM::withdraw(double amount) {
+    if (!currentSession) {
+        std::cout << "No active session." << std::endl;
+        return;
+    }
 
-// bool ATM::withdraw(double amount) {
-//     if (!currentSession) { // 활성화 안됨 
-//         std::cout << "No active session." << std::endl;
-//         return false;
-//     }
+    if (withdrawalCount >= MAX_WITHDRAWAL_COUNT) {
+        std::cout << "Maximum withdrawal count reached. Please end session and start again." << std::endl;
+        return;
+    }
 
-//     if (withdrawalCount >= MAX_WITHDRAWAL_COUNT) { // 최대 인출 횟수 초과 
-//         std::cout << "Maximum withdrawal count reached. Please end session and start again." << std::endl;
-//         return false;
-//     }
+    if (amount > MAX_WITHDRAWAL_AMOUNT) {
+        std::cout << "Amount exceeds maximum withdrawal limit of " << MAX_WITHDRAWAL_AMOUNT << std::endl;
+        return;
+    }
 
-//     if (amount > MAX_WITHDRAWAL_AMOUNT) {// 최대 인출 한도 초과 
-//         std::cout << "Amount exceeds maximum withdrawal limit of " << MAX_WITHDRAWAL_AMOUNT << std::endl;
-//         return false;
-//     }
+    Account* account = currentSession->getActiveAccount();
+    if (!account) return;
 
+    int fee = account->getBankName() == primaryBank->getbankname() ?
+        primaryBank->getwfee() : primaryBank->getwfee() * 2;
 
-//     Account* account = currentSession->getActiveAccount();
-//     if (!account) return false;
+    if (atmCashBalance < (amount + fee)) {
+        std::cout << "ATM has insufficient funds." << std::endl;
+        return;
+    }
 
-//     int fee = account->getBankName() == primaryBank->getbankname() ? 
-//               primaryBank->getwfee() : primaryBank->getwfee() * 2; // 수수료 
-
-//     if (atmCashBalance < (amount + fee)) {//ATM 잔액 부족 
-//         std::cout << "ATM has insufficient funds." << std::endl;
-//         return false;
-//     }
-
-//     if (account->withdraw(amount + fee)) {//출금 성공 
-//         atmCashBalance -= amount;
-//         withdrawalCount++;
-//         Transaction trans("Withdrawal", amount);
-//         currentSession->addTransaction(trans);
-//         std::cout << "Withdrawal successful" << std::endl;
-//         return true;
-//     }
-// 	// 출금 수수료 찾기
-//     std::cout << "Withdrawal failed - insufficient funds in account" << std::endl; // 계좌 잔액 부족
-//     return false;
-// }
+    if (account->withdraw(amount + fee)) {
+        atmCashBalance -= amount;
+        withdrawalCount++;
+        Transaction trans("Withdrawal", amount);
+        currentSession->addTransaction(trans);
+        std::cout << "Withdrawal successful" << std::endl;
+        return;
+    }
+    std::cout << "Withdrawal failed - insufficient funds in account" << std::endl;
+    return;
+}
 
 bool ATM::transfer(Account* target, double amount) {
     if (!currentSession) {
