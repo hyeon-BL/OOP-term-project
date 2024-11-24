@@ -22,8 +22,8 @@ void Bank::setisprimarybank(bool isprimary) {
     isprimarybank = isprimary;
     dfee = isprimary ? 1000 : 2000;
     wfee = isprimary ? 500 : 1000;
-    afee = isprimary ? 500 : 1000;
-    cfee = isprimary ? 1000 : 2000;
+    afee = 2000;
+    cfee = 1000;
 }
 
 void Bank::createaccount(string name, int accnumber, int balance, int password) {
