@@ -105,7 +105,7 @@ void ATM::setLanguage(Language lang) {
 // }
 
 int ATM::atmstart() {
-    int accNumber;
+    long long accNumber; // Changed to long long to handle 12 digits
     int password_in;
     int lang;
     bool isValidAccount = false;
@@ -125,13 +125,34 @@ int ATM::atmstart() {
     // Insert card prompt
     if (currentLanguage == Language::English) {
         cout << "Please insert your card." << endl;
-        cout << "Enter your account number: ";
+        cout << "Enter your 12-digit account number: ";
     }
     else {
         cout << "카드를 삽입하십시오." << endl;
-        cout << "계좌 번호를 입력하십시오: ";
+        cout << "12자리 계좌번호를 입력하십시오: ";
     }
-    cin >> accNumber;
+    
+    do {
+        cin >> accNumber;
+        
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            cout << (currentLanguage == Language::English ? 
+                    "Invalid input. Please enter numbers only.\n" : 
+                    "잘못된 입력입니다. 숫자만 입력하세요.\n");
+            continue;
+        }
+        
+        if (accNumber < 100000000000LL || accNumber > 999999999999LL) {
+            cout << (currentLanguage == Language::English ? 
+                    "Account number must be 12 digits.\n" : 
+                    "계좌번호는 12자리여야 합니다.\n");
+            continue;
+        }
+        
+        break;
+    } while (true);
 
     // Validate account
     for (Bank* bank : supportedBanks) {
@@ -415,7 +436,7 @@ bool ATM::transfer(Account* target, double amount) {
     
     transferAccount = transferBank->getAccount(transfer_to_account);
     if (!transferAccount) {
-        cout << "해당 계좌를 찾을 수 없습니다." << endl;
+        cout << "해당 계좌를 찾�� 수 없습니다." << endl;
         return false;
     }
 
