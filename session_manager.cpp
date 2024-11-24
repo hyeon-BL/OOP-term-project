@@ -272,7 +272,10 @@ ATM* SessionManager::selectATM() {
     
     std::cout << "Select ATM:\n";
     for (size_t i = 0; i < atms.size(); i++) {
-        std::cout << i << ": ATM #" << i + 1 << "\n";
+        std::cout << i << ": ATM #" << atms[i]->getSerialNumber() 
+                  << " (Bank: " << atms[i]->getPrimaryBank()->getbankname() << ")"
+                  << (atms[i]->getATMType() == ATMType::MultiBank ? " [Multi-Bank]" : " [Single-Bank]")
+                  << "\n";
     }
     
     int choice;

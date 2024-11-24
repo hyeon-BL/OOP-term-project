@@ -16,16 +16,19 @@ struct Transaction {
     std::string type;
     double amount;
     std::string timestamp;
+    std::string accountInfo;  // Added field for account info
     
-    Transaction(std::string t, double a);
+    Transaction(std::string t, double a, const Account* acc);
 };
 
+class ATM; // Forward declaration
 
 class Session {
 private:
     Account* activeAccount;
     std::vector<Transaction> transactions;
     SessionState state;
+    bool hasTransactions;  // Added to track if any transactions occurred
 
 public:
     Session();
@@ -33,10 +36,10 @@ public:
     void printSummary() const;
     SessionState getState() const { return state; }
     Account* getActiveAccount() const { return activeAccount; }
-    void setActiveAccount(Account* account) { 
-        activeAccount = account;
-        state = SessionState::Active;
-    }
+    void setActiveAccount(Account* account);
+    void sethasTransactions(bool hasTransactions) { this->hasTransactions = hasTransactions; }
+    bool processUserChoice(ATM* atm);  // New method to handle user choices
+    bool hasCompletedTransactions() const { return hasTransactions; }
 };
 
 class ATM {
@@ -65,6 +68,10 @@ public:
     bool endSession();
     bool validateCard(Account* account) const;
     void setLanguage(Language lang);
+    bool IsBilingual() const { return isBilingual; }
+    int getSerialNumber() const { return serialNumber; }
+    Bank* getPrimaryBank() const { return primaryBank; }
+    ATMType getATMType() const { return type; }
     
     // Transaction operations
     void deposit();
