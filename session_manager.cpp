@@ -75,13 +75,6 @@ void SessionManager::createATM() {
     int bilingualChoice;
     int primaryBankIndex;
     
-    try {
-        std::cin >> serialNumber;
-    } catch (std::exception& e) {
-        std::cout << "Invalid input. Please enter numbers only.\n";
-        std::cin.clear();
-        return;
-    }
 
     do {
         std::cout << "Enter 6-digit ATM serial number (100000-999999): ";
