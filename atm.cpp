@@ -111,6 +111,7 @@ int ATM::atmstart() {
     bool isValidAccount = false;
     bool isAdminCard = false;
 
+    // if ()
     cout << "Choose your language.  언어를 고르세요." << endl;
     cout << "1. English, 2. Korean\n";
     cout << "1. 영어, 2. 한국어\n";

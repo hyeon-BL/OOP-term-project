@@ -178,7 +178,8 @@ void SessionManager::createATM() {
 
 void SessionManager::createAccount() {
     std::string name;
-    int accountNumber, initialBalance, password;
+    int initialBalance, password;
+    long long accountNumber;
     int bankIndex;
     
     std::cout << "Select bank (";
@@ -233,12 +234,11 @@ void SessionManager::createAccount() {
             continue;
         }
         
-        // Check if number is 12 digits
-        if (accountNumber < 100000000000LL || accountNumber > 999999999999LL) {
+        if (accountNumber < 100000000000 || accountNumber > 999999999999) {
             std::cout << "Account number must be 12 digits.\n";
             continue;
         }
-        
+
         break;
     } while (true);
     
@@ -299,7 +299,6 @@ void SessionManager::run() {
         std::cout << "1. Create new account\n";
         std::cout << "2. Use ATM\n";
         std::cout << "3. Exit\n";
-        std::cout << "Choice: ";
         
         int choice;
         do {
