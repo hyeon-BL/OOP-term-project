@@ -75,7 +75,6 @@ void SessionManager::createATM() {
     int bilingualChoice;
     int primaryBankIndex;
     
-    std::cout << "Enter ATM serial number: ";
     try {
         std::cin >> serialNumber;
     } catch (std::exception& e) {

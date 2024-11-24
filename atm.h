@@ -62,7 +62,7 @@ public:
     ATM(int serial, ATMType atmType, bool bilingual, Bank* primary, const std::vector<Bank*>& banks);
     ~ATM();
 
-    int atmstart();
+    void atmstart();
     void readCardInfo(int accNum);
     bool insertCard(Account* account);
     bool endSession();
