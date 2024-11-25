@@ -20,12 +20,12 @@ protected:
 
 public:
     // 생성자와 소멸자
-    Account(string name, int number, int password, int initialBalance = 0);
+    Account(string name, long long number, int password, int initialBalance = 0);
     ~Account();
 
     // Getter 메서드
     string getAccName() const; // 사용자 이름 확인 
-    int getAccNumber() const;	// 계좌번호 확인 
+    long long getAccNumber() const;	// 계좌번호 확인 
     int getBalance() const;		//계좌 잔액 확인 
     string getBankName() const;	// 계좌 은행 확인 
     vector<string> getTransactionHistory() const; //계좌 기록 확인 
@@ -41,7 +41,7 @@ public:
 
 class normalAccount : public Account{ // 일반 계좌 정보 
 public:
-    normalAccount(Bank* bank, string name, int number, int password, int accbalance);
+    normalAccount(Bank* bank, string name, long long number, int password, int accbalance);
     bool isAdmincheck() const override;		
 };
 

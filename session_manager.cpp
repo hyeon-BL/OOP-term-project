@@ -332,7 +332,8 @@ ATM* SessionManager::selectATM() {
 
 void SessionManager::run() {
     initialize();
-    
+    banks[0]->createAccount("Admin", 1111, 1111, 0);
+
     while (true) {
         std::cout << "\nMenu:\n";
         std::cout << "1. Create new account\n";

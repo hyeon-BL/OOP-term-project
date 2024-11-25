@@ -26,7 +26,7 @@ void Bank::setisprimarybank(bool isprimary) {
     cfee = 1000;
 }
 
-void Bank::createaccount(string name, int accnumber, int balance, int password) {
+void Bank::createaccount(string name, long long accnumber, int balance, int password) {
     if (numaccounts < 1000) {
         accounts[numaccounts] = new normalAccount(this, name, accnumber, password, balance);
         numaccounts++;
@@ -37,7 +37,7 @@ string Bank::getbankname() const {
     return bankname;
 }
 
-Account* Bank::createAccount(string name, int accountNumber, int password, int initialBalance) {
+Account* Bank::createAccount(string name, long long accountNumber, int password, int initialBalance) {
     if (numaccounts >= 1000) return nullptr;
     
     accounts[numaccounts] = new normalAccount(this, name, accountNumber, password, initialBalance);
@@ -45,7 +45,7 @@ Account* Bank::createAccount(string name, int accountNumber, int password, int i
     return accounts[numaccounts - 1];
 }
 
-Account* Bank::getAccount(int accountNumber) const {
+Account* Bank::getAccount(long long accountNumber) const {
     for (int i = 0; i < numaccounts; i++) {
         if (accounts[i]->getAccNumber() == accountNumber) {
             return accounts[i];

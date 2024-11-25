@@ -26,10 +26,10 @@ public:
     int getwfee() const { return wfee; }
     int getafee() const { return afee; }
     int getcfee() const { return cfee; }
-    Account* getAccount(int accountNumber) const;
-    Account* createAccount(std::string name, int accountNumber, int password, int initialBalance = 0);
+    Account* getAccount(long long accountNumber) const;
+    Account* createAccount(std::string name, long long accountNumber, int password, int initialBalance = 0);
 
-    void createaccount(std::string name, int number, int accbalance, int password);  // Updated signature
+    void createaccount(std::string name, long long number, int accbalance, int password);  // Updated signature
     void printbankaccount() const;  // Prints account details
     //std::string Bank;
 };
