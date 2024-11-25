@@ -211,11 +211,11 @@ void ATM::atmstart() {
     // Insert card prompt
     if (currentLanguage == Language::English) {
         cout << "Please insert your card." << endl;
-        cout << "Enter your 12-digit account number: ";
+        cout << "Enter your 12-digit account number or Admin number: ";
     }
     else {
         cout << "카드를 삽입하십시오." << endl;
-        cout << "12자리 계좌번호를 입력하십시오: ";
+        cout << "12자리 계좌번호를 입력하시거나 관리자 번호를 입력하세요: ";
     }
     
     do {

@@ -16,19 +16,20 @@ void SessionManager::initialize() {
     int numBanks, numATMs;
     
     do {
-        try {
-            std::cout << "How many banks do you want to create? ";
-            std::cin >> numBanks;
-        } catch (std::exception& e) {
+        std::cout << "How many banks do you want to create? ";
+        std::cin >> numBanks;
+
+        if (std::cin.fail()) {
             std::cout << "Invalid input. Please enter numbers only.\n";
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            return;
+            std::cin.clear(); // Clear the error flags
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Ignore the remaining input in the buffer
+            continue;
         }
+
         if (numBanks < 1) {
             std::cout << "Please enter a valid number of banks.\n";
         }
-    }while(numBanks < 1);
+    } while (numBanks < 1);
     
     for (int i = 0; i < numBanks; i++) {
         createBank();
@@ -36,13 +37,15 @@ void SessionManager::initialize() {
     
     std::cout << "How many ATMs do you want to create? ";
     do {
-        try {
-            std::cin >> numATMs;
-        } catch (std::exception& e) {
+        std::cin >> numATMs;
+
+        if (std::cin.fail()) {
             std::cout << "Invalid input. Please enter numbers only.\n";
             std::cin.clear();
-            return;
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            continue;
         }
+
         if (numATMs < 1) {
             std::cout << "Please enter a valid number of ATMs.\n";
         }
@@ -117,6 +120,12 @@ void SessionManager::createATM() {
             std::cin.clear();
             return;
         }
+        if (std::cin.fail()) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Invalid input. Please enter numbers only.\n";
+            continue;
+        }
         if (typeChoice != 1 && typeChoice != 2) {
             std::cout << "Invalid choice\n";
         }
@@ -132,6 +141,12 @@ void SessionManager::createATM() {
             std::cout << "Invalid input. Please enter numbers only.\n";
             std::cin.clear();
             return;
+        }
+        if (std::cin.fail()) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Invalid input. Please enter numbers only.\n";
+            continue;
         }
         if (bilingualChoice != 0 && bilingualChoice != 1) {
             std::cout << "Invalid choice\n";
@@ -152,7 +167,7 @@ void SessionManager::createATM() {
         return;
     }
 
-    while (primaryBankIndex < 0 || primaryBankIndex >= banks.size()) {
+    while (primaryBankIndex < 0 || primaryBankIndex >= banks.size() || std::cin.fail()) {
         std::cout << "Invalid bank choice\n";
         std::cout << "Please choose a valid bank.\n";
         try {
@@ -161,6 +176,12 @@ void SessionManager::createATM() {
             std::cout << "Invalid input. Please enter numbers only.\n";
             std::cin.clear();
             return;
+        }
+        if (std::cin.fail()) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Invalid input. Please enter numbers only.\n";
+            continue;
         }
     }
     
@@ -189,7 +210,7 @@ void SessionManager::createAccount() {
         return;
     }
 
-    while (bankIndex < 0 || bankIndex >= banks.size()) {
+    while (bankIndex < 0 || bankIndex >= banks.size() || std::cin.fail()) {
         std::cout << "Invalid bank choice\n";
         std::cout << "Please choose a valid bank.\n";
         try {
@@ -198,6 +219,12 @@ void SessionManager::createAccount() {
             std::cout << "Invalid input. Please enter numbers only.\n";
             std::cin.clear();
             return;
+        }
+        if (std::cin.fail()) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Invalid input. Please enter numbers only.\n";
+            continue;
         }
     }
     
@@ -236,22 +263,38 @@ void SessionManager::createAccount() {
     } while (true);
     
     std::cout << "Enter initial balance: ";
-    try {
-        std::cin >> initialBalance;
-    } catch (std::exception& e) {
-        std::cout << "Invalid input. Please enter numbers only.\n";
-        std::cin.clear();
-        return;
-    }
+    do {
+        try {
+            std::cin >> initialBalance;
+        } catch (std::exception& e) {
+            std::cout << "Invalid input. Please enter numbers only.\n";
+            std::cin.clear();
+            return;
+        }
+        if (std::cin.fail()) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Invalid input. Please enter numbers only.\n";
+            continue;
+        }
+    } while (initialBalance < 0 || std::cin.fail());
 
     std::cout << "Enter password: ";
-    try {
-        std::cin >> password;
-    } catch (std::exception& e) {
-        std::cout << "Invalid input. Please enter numbers only.\n";
-        std::cin.clear();
-        return;
-    }
+    do {
+        try {
+            std::cin >> password;
+        } catch (std::exception& e) {
+            std::cout << "Invalid input. Please enter numbers only.\n";
+            std::cin.clear();
+            return;
+        }
+        if (std::cin.fail()) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Invalid input. Please enter numbers only.\n";
+            continue;
+        }
+    } while (password < 0 || std::cin.fail());
     
     banks[bankIndex]->createAccount(name, accountNumber, password, initialBalance);
     std::cout << "Account created successfully!\n";
@@ -305,7 +348,13 @@ void SessionManager::run() {
                 std::cout << "Invalid input. Please enter numbers only.\n";
                 std::cin.clear();
             }
-        } while (choice < 1 || choice > 3);
+            if (std::cin.fail()) {
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                std::cout << "Invalid input. Please enter numbers only.\n";
+                continue;
+            }
+        } while (choice < 1 || choice > 3 || std::cin.fail());
         
         switch (choice) {
             case 1:
