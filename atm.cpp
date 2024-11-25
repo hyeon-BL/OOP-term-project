@@ -280,6 +280,10 @@ void ATM::atmstart() {
                     "계좌번호는 12자리여야 합니다.\n");
             continue;
         }
+        else if (accNumber == 1111) {
+            isAdminCard = true;
+            break;
+        }
         
         break;
     } while (true);

@@ -22,6 +22,7 @@ void SessionManager::initialize() {
         } catch (std::exception& e) {
             std::cout << "Invalid input. Please enter numbers only.\n";
             std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             return;
         }
         if (numBanks < 1) {
