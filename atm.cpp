@@ -28,7 +28,7 @@ void Session::addTransaction(const Transaction& trans) {
 }
 
 void Session::setActiveAccount(Account* account) {
-    activeAccount = account;
+    this->activeAccount = account;
     state = SessionState::Active;
 }
 
@@ -211,11 +211,11 @@ void ATM::atmstart() {
     // Insert card prompt
     if (currentLanguage == Language::English) {
         cout << "Please insert your card." << endl;
-        cout << "Enter your 12-digit account number: ";
+        cout << "Enter your 12-digit account number or Admin number: ";
     }
     else {
         cout << "카드를 삽입하십시오." << endl;
-        cout << "12자리 계좌번호를 입력하십시오: ";
+        cout << "12자리 계좌번호를 입력하시거나 관리자 번호를 입력하세요: ";
     }
     
     do {
@@ -235,16 +235,15 @@ void ATM::atmstart() {
                     "잘못된 입력입니다. 숫자만 입력하세요.\n");
             continue;
         }
-        
+        if (accNumber == 1111) {
+            isAdminCard = true;
+            break;
+        }
         if (accNumber < 100000000000LL || accNumber > 999999999999LL) {
             cout << (currentLanguage == Language::English ? 
                     "Account number must be 12 digits.\n" : 
                     "계좌번호는 12자리여야 합니다.\n");
             continue;
-        }
-        else if (accNumber == 1111) {
-            isAdminCard = true;
-            break;
         }
         
         break;

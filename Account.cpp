@@ -7,7 +7,7 @@
 using namespace std;
 
 // 생성자
-Account::Account(string name, int number, int password, int initialBalance)
+Account::Account(string name, long long number, int password, int initialBalance)
     : accName(name), accNumber(number), password(password), accbalance(initialBalance), bankName(nullptr), isAdmin(false) {
 }
 
@@ -19,7 +19,7 @@ string Account::getAccName() const {//계좌 이름 알기
     return accName;
 }
 
-int Account::getAccNumber() const {//계좌 번호 알기 
+long long Account::getAccNumber() const {//계좌 번호 알기 
     return accNumber;
 }
 
@@ -83,7 +83,7 @@ void Account::setBankName(Bank& bank) {
 }
 
 
-normalAccount::normalAccount(Bank* bank, string name, int number, int password, int accbalance) : Account(name, number, password, accbalance) {
+normalAccount::normalAccount(Bank* bank, string name, long long number, int password, int accbalance) : Account(name, number, password, accbalance) {
     this->bankName = bank;
     this->isAdmin = false;
 }
