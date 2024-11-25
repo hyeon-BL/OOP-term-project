@@ -57,6 +57,7 @@ private:
     static const double MAX_WITHDRAWAL_AMOUNT; // Remove constexpr and initialization
     static const int MAX_CASH_INPUT = 50;
     static const int MAX_CHECK_COUNT = 30;
+    int cashInventory[4];
 
 public:
     ATM(int serial, ATMType atmType, bool bilingual, Bank* primary, const std::vector<Bank*>& banks);
@@ -75,10 +76,12 @@ public:
     
     // Transaction operations
     void deposit();
-    void withdraw(double amount);
-    bool transfer(Account* target, double amount);
+    void withdraw();
+    void transfer();
     double getAtmCashBalance() const { return atmCashBalance; }
     void setAtmCashBalance(double amount) { atmCashBalance = amount; }
+    double calculateFee(Bank* recipientBank, Bank* senderBank);
+    void addCash(int* bills);
 };
 
 #endif // ATM_H
