@@ -328,6 +328,7 @@ public:
     bool endSession();
     bool validateCard(Account* account) const;
     void setLanguage(Language lang);
+    Language getLanguage() const { return currentLanguage; }
     bool IsBilingual() const { return isBilingual; }
     int getSerialNumber() const { return serialNumber; }
     Bank* getPrimaryBank() const { return primaryBank; }
@@ -350,6 +351,29 @@ public:
     void depositCash(int amount);
     void withdrawCash(int amount);
 };
+
+std::vector<Bank*> banks;
+std::vector<ATM*> atms;
+
+void printATMsinfo() {
+    std::cout << "=== ATMs Information ===\n";
+    for (size_t i = 0; i < atms.size(); i++) {
+        std::cout << "ATM " << i + 1 << ": ";
+        atms[i]->showCashInventory();
+    }
+}
+
+void printAccountsinfo() {
+    for (size_t i = 0; i < banks.size(); i++) {
+        std::cout << "=== Accounts Information ===\n";
+        std::cout << "Account" << i + 1 << ": ";
+        banks[i]->printbankaccount();
+    }
+}
+
+void ATM::recordTransaction(const std::string& transaction) {
+    transactionLog.push_back(transaction);
+}
 
 void ATM::recordTransaction(const std::string& transaction) {
     transactionLog.push_back(transaction);
@@ -454,48 +478,82 @@ void Session::setActiveAccount(Account* account) {
 
 bool Session::processUserChoice(ATM* atm) {
     while (state == SessionState::Active) {
-        cout << "\n=== ATM Menu ===\n";
-        cout << "1. Deposit\n";
-        cout << "2. Withdraw\n";
-        cout << "3. Transfer\n";
-        cout << "4. Check Balance\n";
-        cout << "5. End Session\n";
-        cout << "Choose an option: ";
+        if (atm->getLanguage() == Language::English) {
+            std::cout << "\n=== ATM Menu ===\n";
+            std::cout << "1. Deposit\n";
+            std::cout << "2. Withdraw\n";
+            std::cout << "3. Transfer\n";
+            std::cout << "4. Check Balance\n";
+            std::cout << "5. End Session\n";
+            std::cout << "/ : Show ATM and Account Info\n";
+            std::cout << "Choose an option: ";
+        }
+        else {
+            std::cout << "\n=== ATM 메뉴 ===\n";
+            std::cout << "1. 입금\n";
+            std::cout << "2. 출금\n";
+            std::cout << "3. 이체\n";
+            std::cout << "4. 잔액 확인\n";
+            std::cout << "5. 세션 종료\n";
+            std::cout << "/ : ATM 및 계좌 정보 표시\n"; 
+            std::cout << "옵션을 선택하세요: ";
+        }
 
-        int choice;
+
+        string userInput;
+        int choice = -1;  // 유효하지 않은 값으로 초기화
+
         do {
             try {
-                cin >> choice;
+                cin >> userInput;
+
+                // 숫자인 경우 숫자로 변환
+                if (isdigit(userInput[0]) && userInput.size() == 1) {
+                    choice = stoi(userInput);
+                }
+                else if (userInput == "/") {
+                    // '/' 입력 처리
+                    printATMsinfo();
+                    printAccountsinfo();
+                    break;  // 다시 메뉴를 출력하도록 루프 종료
+                }
+                else {
+                    throw std::invalid_argument("Invalid input.");
+                }
             }
             catch (std::exception& e) {
-                cout << "Invalid input. Please enter numbers only.\n";
+                cout << "Invalid input. Please enter a valid option (1-5 or /).\n";
                 cin.clear();
-                break;
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');  // 입력 버퍼 정리
+                choice = -1;  // choice를 초기화하여 유효한 입력이 들어올 때까지 반복
             }
         } while (choice < 1 || choice > 5);
 
+        if (choice == -1) {
+            continue;  // 루프를 반복하여 다시 메뉴 선택
+        }
+
+        // 유효한 선택에 따라 처리
         switch (choice) {
         case 1:
             atm->deposit();
             this->sethasTransactions(true);
             break;
-        case 2: {
+        case 2:
             atm->withdraw();
             this->sethasTransactions(true);
             break;
-        }
-        case 3: {
+        case 3:
             atm->transfer();
             this->sethasTransactions(true);
             break;
-        }
         case 4:
             cout << "Current balance: " << activeAccount->getBalance() << endl;
             break;
         case 5:
-            return false;  // End session
+            return false;  // 세션 종료
         default:
-            cout << "Invalid option\n";
+            cout << "Invalid option\n";  // 사실상 필요 없는 기본 처리
         }
     }
     return true;
@@ -981,6 +1039,7 @@ void ATM::deposit() {
 
     account->deposit(totalAmount - fee);
     atmCashBalance += (depositType == 1 ? totalAmount : 0);
+    atmCashBalance += (depositType == 2 ? fee : 0);
     Transaction trans("Deposit", totalAmount, account);
     currentSession->addTransaction(trans);
 
