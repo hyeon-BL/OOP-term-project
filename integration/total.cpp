@@ -303,6 +303,7 @@ private:
     Bank* primaryBank;//ATM의 primary bank 
     std::vector<Bank*> supportedBanks;//가능한 은행 
     Session* currentSession;
+    Language currentLanguage;// 지원 언어 
     double atmCashBalance;
     int withdrawalCount;
     static const int MAX_WITHDRAWAL_COUNT = 3;
@@ -319,13 +320,12 @@ public:
     ATM(int serial, ATMType atmType, bool bilingual, Bank* primary, const std::vector<Bank*>& banks);
     ~ATM();
 
-    Language currentLanguage;// 지원 언어 
     void atmstart();
     //void readCardInfo(int accNum);
     bool insertCard(Account* account);
     bool endSession();
     bool validateCard(Account* account) const;
-    void setLanguage(Language lang) { currentLanguage = lang; }
+    void setLanguage(Language lang);
     bool IsBilingual() const { return isBilingual; }
     int getSerialNumber() const { return serialNumber; }
     Bank* getPrimaryBank() const { return primaryBank; }
@@ -355,21 +355,12 @@ void ATM::recordTransaction(const std::string& transaction) {
 
 // 거래 기록을 출력하는 함수
 void ATM::displayTransactionHistory() const {
-    if (currentLanguage == Language::English) {
-        std::cout << "Transaction History:\n";
-        if (transactionLog.empty()) {
-            std::cout << "No transactions recorded." << std::endl;
-            return;
-        }
+    if (transactionLog.empty()) {
+        std::cout << "No transactions recorded." << std::endl;
+        return;
     }
-    else {
-        std::cout << "거래 기록:\n";
-        if (transactionLog.empty()) {
-            std::cout << "기록된 거래가 없습니다." << std::endl;
-            return;
-        }
 
-    }
+    std::cout << "Transaction History:\n";
     for (const auto& transaction : transactionLog) {
         std::cout << transaction << std::endl;
     }
@@ -378,17 +369,9 @@ void ATM::displayTransactionHistory() const {
 // 거래 기록을 파일로 저장하는 함수
 void ATM::saveTransactionHistoryToFile(const std::string& filename) const {
     std::ofstream outFile(filename);
-    if (currentLanguage == Language::English) {
-        if (!outFile) {
-            std::cerr << "Failed to open file: " << filename << std::endl;
-            return;
-        }
-    }
-    else {
-        if (!outFile) {
-            std::cerr << "파일을 열 수 없습니다: " << filename << std::endl;
-            return;
-        }
+    if (!outFile) {
+        std::cerr << "Failed to open file: " << filename << std::endl;
+        return;
     }
 
     for (const auto& transaction : transactionLog) {
@@ -396,59 +379,28 @@ void ATM::saveTransactionHistoryToFile(const std::string& filename) const {
     }
 
     outFile.close();
-    if (currentLanguage == Language::English) {
-        std::cout << "Transaction history saved to " << filename << std::endl;
-    }
-    else {
-        std::cout << filename << "에 거래 기록이 저장되었습니다." << std::endl;
-    }
+    std::cout << "Transaction history saved to " << filename << std::endl;
 }
 
 // 현금 입금 기능
 void ATM::depositCash(int amount) {
-    if (currentLanguage == Language::English) {
-        if (amount <= 0) {
-            std::cout << "Invalid deposit amount." << std::endl;
-            return;
-        }
-    }
-    else {
-        if (amount <= 0) {
-            std::cout << "유효하지 않은 입금 금액입니다." << std::endl;
-            return;
-        }
+    if (amount <= 0) {
+        std::cout << "Invalid deposit amount." << std::endl;
+        return;
     }
 
-    if (currentLanguage == Language::English) {
-        std::cout << "Deposited: " << amount << " successfully." << std::endl;
-    }
-    else {
-        std::cout << "입금 완료: " << amount << "원" << std::endl;
-    }
+    std::cout << "Deposited: " << amount << " successfully." << std::endl;
     recordTransaction("Deposit: " + std::to_string(amount) + " won");
 }
 
 // 현금 출금 기능
 void ATM::withdrawCash(int amount) {
-    if (currentLanguage == Language::English) {
-        if (amount <= 0) {
-            std::cout << "Invalid withdrawal amount." << std::endl;
-            return;
-        }
-    }
-    else {
-        if (amount <= 0) {
-            std::cout << "유효하지 않은 출금 금액입니다." << std::endl;
-            return;
-        }
-    }
-    if (currentLanguage == Language::English) {
-        std::cout << "Withdrawn: " << amount << " successfully." << std::endl;
-    }
-    else {
-        std::cout << "출금 완료: " << amount << "원" << std::endl;
+    if (amount <= 0) {
+        std::cout << "Invalid withdrawal amount." << std::endl;
+        return;
     }
 
+    std::cout << "Withdrawn: " << amount << " successfully." << std::endl;
     recordTransaction("Withdrawal: " + std::to_string(amount) + " won");
 }
 
@@ -500,25 +452,13 @@ void Session::setActiveAccount(Account* account) {
 
 bool Session::processUserChoice(ATM* atm) {
     while (state == SessionState::Active) {
-        if (atm->currentLanguage == Language::English) {
-            cout << "\n=== ATM Menu ===\n";
-            cout << "1. Deposit\n";
-            cout << "2. Withdraw\n";
-            cout << "3. Transfer\n";
-            cout << "4. Check Balance\n";
-            cout << "5. End Session\n";
-            cout << "Choose an option: ";
-        }
-        else {
-            cout << "\n=== ATM 메뉴 ===\n";
-            cout << "1. 입금\n";
-            cout << "2. 출금\n";
-            cout << "3. 송금\n";
-            cout << "4. 잔액 확인\n";
-            cout << "5. 세션 종료\n";
-            cout << "옵션을 선택하십시오: ";
-        }
-
+        cout << "\n=== ATM Menu ===\n";
+        cout << "1. Deposit\n";
+        cout << "2. Withdraw\n";
+        cout << "3. Transfer\n";
+        cout << "4. Check Balance\n";
+        cout << "5. End Session\n";
+        cout << "Choose an option: ";
 
         int choice;
         do {
@@ -548,12 +488,7 @@ bool Session::processUserChoice(ATM* atm) {
             break;
         }
         case 4:
-            if (atm->currentLanguage == Language::English) {
-                cout << "Current balance: " << activeAccount->getBalance() << endl;
-            }
-            else {
-                cout << "현재 잔액: " << activeAccount->getBalance() << endl;
-            }
+            cout << "Current balance: " << activeAccount->getBalance() << endl;
             break;
         case 5:
             return false;  // End session
@@ -567,16 +502,9 @@ bool Session::processUserChoice(ATM* atm) {
 
 bool Session::processAdminChoice(ATM* atm) {
     while (state == SessionState::Active) {
-        if (atm->currentLanguage == Language::English) {
-            cout << "\n=== ATM Menu ===\n";
-            cout << "1. showhistory\n";
-            cout << "2. End Session\n";
-        }
-        else {
-            cout << "\n=== ATM 메뉴 ===\n";
-            cout << "1. 거래 내역 확인\n";
-            cout << "2. 세션 종료\n";
-        }
+        cout << "\n=== ATM Menu ===\n";
+        cout << "1. showhistory\n";
+        cout << "2. End Session\n";
 
         int choice;
         do {
@@ -594,7 +522,7 @@ bool Session::processAdminChoice(ATM* atm) {
         case 1:
             atm->displayTransactionHistory();
             atm->saveTransactionHistoryToFile("transaction_history.txt");
-            break;
+            return false;
         case 2: {
             return false;
         }
@@ -660,12 +588,7 @@ void ATM::setLanguage(Language lang) {
 
 void ATM::showhistory() {
     if (history == "") {
-        if (currentLanguage == Language::English) {
-            cout << "No record" << endl;
-        }
-        else {
-            cout << "기록 없음" << endl;
-        }
+        cout << "No record" << endl;
         return;
     }
     cout << history << endl;
@@ -772,9 +695,11 @@ void ATM::atmstart() {
     if (!isValidAccount) {
         if (currentLanguage == Language::English) {
             cout << "Error: No account found. Returning your card." << endl;
+            return;
         }
         else {
             cout << "오류: 계좌를 찾을 수 없습니다. 카드를 반환합니다." << endl;
+            return;
         }
     }
 
@@ -859,7 +784,7 @@ void ATM::atmstart() {
         while (currentSession != nullptr) {
             if (!currentSession->processAdminChoice(this)) {
                 if (currentSession->hasCompletedTransactions()) {
-                    currentSession->printSummary();
+                    //currentSession->printSummary();
                 }
                 endSession();
                 break;
@@ -870,7 +795,7 @@ void ATM::atmstart() {
         while (currentSession != nullptr) {
             if (!currentSession->processUserChoice(this)) {
                 if (currentSession->hasCompletedTransactions()) {
-                    currentSession->printSummary();
+                    //currentSession->printSummary();
                 }
                 endSession();
                 break;
@@ -884,35 +809,17 @@ void ATM::atmstart() {
 
 bool ATM::insertCard(Account* account) {
     if (!validateCard(account)) {
-        if (this->currentLanguage == Language::Korean) {
-            std::cout << "이 ATM에서 사용할 수 없는 카드입니다.";
-            return false;
-        }
-        else {
-            std::cout << "Invalid card for this ATM.";
-            return false;
-        }
+        cout << "Invalid card for this ATM.";
+        return false;
     }
     if (currentSession != nullptr) {
-        if (this->currentLanguage == Language::Korean) {
-            std::cout << "세션이 이미 진행 중입니다.";
-            return false;
-        }
-        else {
-            std::cout << "Session already in progress.";
-            return false;
-        }
+        cout << "Session already in progress.";
+        return false;
     }
     currentSession = new Session();
     currentSession->setActiveAccount(account);
-    if (this->currentLanguage == Language::Korean) {
-        std::cout << "카드가 인식되었습니다. 환영합니다!";
-        return true;
-    }
-    else {
-        std::cout << "Card accepted. Welcome!";
-        return true;
-    }
+    cout << "Card accepted. Welcome!";
+    return true;
 }
 
 
@@ -922,14 +829,8 @@ bool ATM::endSession() {
     currentSession->printSummary();
     delete currentSession;
     currentSession = nullptr;
-    if (currentLanguage == Language::Korean) {
-        std::cout << "세션이 종료되었습니다.";
-        return true;
-    }
-    else {
-        std::cout << "Thank you for using our ATM.";
-        return true;
-    }
+    cout << "Thank you for using our ATM.";
+    return true;
 }
 
 
@@ -962,12 +863,8 @@ void ATM::addCash(int* bills) {
         cashInventory[i] += bills[i];
         atmCashBalance += bills[i] * denominationValues[i];
     }
-    if (currentLanguage == Language::Korean) {
-        std::cout << "ATM 현금 재고가 업데이트되었습니다." << std::endl;
-    }
-    else {
-        std::cout << "ATM cash inventory updated." << std::endl;
-    }
+
+    std::cout << "ATM cash inventory updated." << std::endl;
     showCashInventory();
 }
 
@@ -976,52 +873,26 @@ void ATM::showCashInventory() const {
     const int denominationValues[4] = { 50000, 10000, 5000, 1000 };
     std::cout << "ATM Cash Inventory:" << std::endl;
     for (int i = 0; i < 4; i++) {
-        if (currentLanguage == Language::Korean) {
-            std::cout << denominationValues[i] << "원권: " << cashInventory[i] << "장" << std::endl;
-        }
-        else {
-            std::cout << denominationValues[i] << " won bills: " << cashInventory[i] << std::endl;
-        }
+        std::cout << denominationValues[i] << "원권: " << cashInventory[i] << "장" << std::endl;
     }
-    if (currentLanguage == Language::Korean) {
-        std::cout << "총 현금 잔고: " << atmCashBalance << "원" << std::endl;
-    }
-    else {
-        std::cout << "Total cash balance: " << atmCashBalance << " won" << std::endl;
-    }
+    std::cout << "Total Cash Balance: " << atmCashBalance << "원" << std::endl;
 }
 
 
 void ATM::deposit() {
     if (!currentSession) {
-        if (currentLanguage == Language::Korean) {
-            std::cout << "세션이 활성화되지 않았습니다.";
-        }
-        else {
-            std::cout << "No active session.";
-        }
+        std::cout << "No active session." << std::endl;
         return;
     }
     Account* account = currentSession->getActiveAccount();
     if (!account) {
-        if (currentLanguage == Language::Korean) {
-            std::cout << "계좌가 활성화되지 않았습니다.";
-        }
-        else {
-            std::cout << "Account not active.";
-        }
+        std::cout << "No card inserted." << std::endl;
         return;
     }
 
     int depositType;
-    if (currentLanguage == Language::Korean) {
-        std::cout << "입금 타입을 고르시오" << endl;
-        std::cout << "1. 현금 2. 수표 3. 취소" << endl;
-    }
-    else {
-        std::cout << "Choose deposit type" << endl;
-        std::cout << "1. Cash 2. Check 3. Cancel" << endl;
-    }
+    std::cout << "입금 타입을 고르시오" << endl;
+    std::cout << "1. 현금 2. 수표 3. 취소" << endl;
     std::cin >> depositType;
 
     double totalAmount = 0.0;
@@ -1036,32 +907,17 @@ void ATM::deposit() {
             totalAmount = 0.0;
 
             for (int i = 0; i < 4; i++) {
-                if (currentLanguage == Language::Korean) {
-                    std::cout << denominationValues[i] << "원권의 장수를 입력: ";
-                }
-                else {
-                    std::cout << "Enter the number of " << denominationValues[i] << " won bills: ";
-                }
+                std::cout << denominationValues[i] << "원권을 입금해주세요: ";
                 std::cin >> denominations[i];
                 totalBills += denominations[i];
                 totalAmount += denominations[i] * denominationValues[i];
             }
 
             if (totalBills > MAX_CASH_INPUT) {
-                if (currentLanguage == Language::Korean) {
-                    std::cout << "입금할 수 있는 현금의 장수를 초과하였습니다. 최대 " << MAX_CASH_INPUT << "장까지 가능합니다. 다시 입력해주세요." << endl;
-                }
-                else {
-                    std::cout << "Exceeded the number of bills that can be deposited. Maximum " << MAX_CASH_INPUT << " bills allowed. Please try again." << endl;
-                }
+                std::cout << "입금하신 현금이 너무 많습니다. 한번에 최대: " << MAX_CASH_INPUT << "장만 입금 가능합니다. 다시 입력해주세요.\n";
             }
             else if (totalBills <= 0) {
-                if (currentLanguage == Language::Korean) {
-                    std::cout << "유효하지 않은 현금 장수입니다. 다시 입력해주세요." << endl;
-                }
-                else {
-                    std::cout << "Invalid number of bills. Please try again." << endl;
-                }
+                cout << "다시 입금해주세요" << endl;
             }
         } while (totalBills > MAX_CASH_INPUT);
 
@@ -1074,82 +930,43 @@ void ATM::deposit() {
         int checkCount;
 
         do {
-            if (currentLanguage == Language::Korean) {
-                std::cout << "수표 장수를 입력: ";
-            }
-            else {
-                std::cout << "Enter the number of checks: ";
-            }
+            std::cout << "입력할 수표의 장수를 입력: ";
             std::cin >> checkCount;
 
             if (checkCount > MAX_CHECK_COUNT) {
-                if (currentLanguage == Language::English) {
-                    std::cout << "Exceeded the number of checks that can be deposited. Maximum " << MAX_CHECK_COUNT << " checks allowed. Please try again." << endl;
-                }
-                else {
-                    std::cout << "입금할 수 있는 수표의 장수를 초과하였습니다. 최대 " << MAX_CHECK_COUNT << "장까지 가능합니다. 다시 입력해주세요." << endl;}
+                std::cout << "수표가 너무 많습니다. 최대: " << MAX_CHECK_COUNT
+                    << "장만 가능합니다. 다시 입력해주세요.\n";
             }
         } while (checkCount > MAX_CHECK_COUNT);
 
         for (int i = 0; i < checkCount; i++) {
             double checkAmount;
-            std::cout << (i + 1);
-            if (currentLanguage == Language::Korean) {
-                std::cout << "번째 수표 금액을 입력: ";
-            }
-            else {
-                std::cout << " check amount: ";
-            }
+            std::cout << (i + 1) << "번째 수표 금액을 입력: ";
             std::cin >> checkAmount;
             totalAmount += checkAmount;
         }
 
     }
     else if (depositType == 3) {
-        if (currentLanguage == Language::Korean) {
-            std::cout << "입금 취소" << endl;
-        }
-        else {
-            std::cout << "Deposit canceled" << endl;
-        }
+        std::cout << "계좌 입금을 취소합니다.\n";
         return;
     }
     else {
-        if (currentLanguage == Language::Korean) {
-            std::cout << "입금 유형을 1.현금 2.수표 3.취소 중 하나를 골라주세요." << endl;
-        }
-        else {
-            std::cout << "Choose deposit type 1.Cash 2.Check 3.Cancel" << endl;
-        }
+        std::cout << "입금 유형을 1.현금 2.수표 3.취소 중 하나를 골라주세요.\n";
         return;
     }
 
     int fee = account->getBankName() == primaryBank->getbankname() ? primaryBank->getdfee() : primaryBank->getdfee() * 2;
 
-    if (currentLanguage == Language::Korean) {
-        std::cout << "입금 수수료: " << fee << "원\n";
-    }
-    else {
-        std::cout << "Deposit fee: " << fee << " won\n";
-    }
+    std::cout << "입금 수수료: " << fee << "원\n";
     int additionalFee = 0;
     int totalFee = 0;
 
     while (totalFee < fee) {
-        if (currentLanguage == Language::Korean) {
-            std::cout << "수수료를 넣어주세요. (" << totalFee << "/" << fee << ")\n";
-        }
-        else {
-            std::cout << "Please insert the fee. (" << totalFee << "/" << fee << ")\n";
-        }
+        std::cout << "수수료를 넣어주세요. (" << totalFee << "/" << fee << ")\n";
         std::cin >> additionalFee;
         if (totalFee + additionalFee > fee) {
-            if (currentLanguage == Language::Korean) {
-                std::cout << "입력하신 수수료가 초과되었습니다. " << "가장 최근에 입력한 " << additionalFee << "원을 반환합니다." << endl;
-            }
-            else {
-                std::cout << "The fee you entered exceeds the required amount. Returning the most recent " << additionalFee << " won." << endl;
-            }
+            std::cout << "입력하신 수수료가 초과되었습니다. " << "가장 최근에 입력한 " << additionalFee << "원을 반환합니다." << endl;
         }
         else {
             totalFee += additionalFee;
@@ -1165,12 +982,7 @@ void ATM::deposit() {
     Transaction trans("Deposit", totalAmount, account);
     currentSession->addTransaction(trans);
 
-    if (currentLanguage == Language::Korean) {
-        std::cout << "입금 완료. 총 입금 금액: " << totalAmount << "원이며 수수료를 제외한" << totalAmount - fee << "원이 입금됩니다" << endl;
-    }
-    else {
-        std::cout << "Deposit complete. Total amount deposited: " << totalAmount << " won. " << totalAmount - fee << " won deposited after fee deduction." << endl;
-    }
+    std::cout << "입금 완료. 총 입금 금액: " << totalAmount << "원이며 수수료를 제외한" << totalAmount - fee << "원이 입금됩니다" << endl;
     ofstream outfile;
     outfile.open(filePath, ios_base::app);
     outfile << message;
@@ -1182,36 +994,36 @@ void ATM::deposit() {
 
 void ATM::withdraw() {
     if (!currentSession) {
-        std::cout << "No active session." << endl;
+        cout << "No active session." << endl;
         return;
     }
 
     if (withdrawalCount >= MAX_WITHDRAWAL_COUNT) {
-        std::cout << "출금 가능 횟수를 초과하였습니다. 세션을 종료한 후 다시 시도해 주세요." << endl;
+        cout << "출금 가능 횟수를 초과하였습니다. 세션을 종료한 후 다시 시도해 주세요." << endl;
         return;
     }
 
     double amount;
-    std::cout << "출금할 총 금액을 입력하시오. ";
+    cout << "출금할 총 금액을 입력하시오. ";
     do {
         try {
-            std::cin >> amount;
+            cin >> amount;
         }
         catch (std::exception& e) {
-            std::cout << "Invalid input. Please enter numbers only.\n";
-            std::cin.clear();
+            cout << "Invalid input. Please enter numbers only.\n";
+            cin.clear();
             break;
         }
     } while (amount <= 0);
 
     if (amount > MAX_WITHDRAWAL_AMOUNT) {
-        std::cout << "출금하고자 하는 금액이 너무 많습니다. 최대" << MAX_WITHDRAWAL_AMOUNT << "원 출금 가능합니다" << endl;
+        cout << "출금하고자 하는 금액이 너무 많습니다. 최대" << MAX_WITHDRAWAL_AMOUNT << "원 출금 가능합니다" << endl;
         return;
     }
 
     Account* account = currentSession->getActiveAccount();
     if (!account) {
-        std::cout << "계좌 정보를 찾을 수 없습니다" << endl;
+        cout << "계좌 정보를 찾을 수 없습니다" << endl;
         return;
     }
 
@@ -1220,7 +1032,7 @@ void ATM::withdraw() {
     double totalAmount = amount + fee;
 
     if (atmCashBalance < totalAmount) {
-        std::cout << "ATM에 충분한 돈이 들어있지 않아 출금이 불가합니다. 죄송합니다." << endl;
+        cout << "ATM에 충분한 돈이 들어있지 않아 출금이 불가합니다. 죄송합니다." << endl;
         return;
     }
 
@@ -1475,7 +1287,6 @@ void ATM::transfer() {
 
     return;
 }
-
 
 
 
