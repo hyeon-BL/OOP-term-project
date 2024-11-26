@@ -188,6 +188,60 @@ void SessionManager::createATM() {
     atms.push_back(new ATM(serialNumber, type, bilingualChoice == 1, 
                           banks[primaryBankIndex], banks));
     std::cout << "ATM created successfully!\n";
+
+    ATM* lastATM = atms.back();
+    depositCashToATM(lastATM);
+}
+
+void SessionManager::depositCashToATM(ATM* atm) {
+    if (!atm) {
+        std::cout << "Invalid ATM instance." << std::endl;
+        return;
+    }
+
+    int* bills = depositcashtoatm(atm); // 사용자 입력 기반 지폐 수량 가져오기
+    if (!bills) {
+        std::cout << "Failed to process cash deposit." << std::endl;
+        return;
+    }
+
+    atm->addCash(bills); // ATM에 현금을 추가
+
+    delete[] bills; // 메모리 해제
+}
+
+
+int* SessionManager::depositcashtoatm(ATM* atm) {
+    if (!atm) {
+        std::cout << "Invalid ATM instance." << std::endl;
+        return nullptr;
+    }
+
+    int* result = new int[4]; // 각 지폐 단위별 개수
+    const int denominations[] = { 50000, 10000, 5000, 1000 };
+
+    std::cout << "Deposit cash from bank to ATM. Please enter the number of bills for each denomination:" << std::endl;
+
+    for (int i = 0; i < 4; i++) {
+        int numBills;
+        do {
+            std::cout << denominations[i] << "won: ";
+            std::cin >> numBills;
+
+            if (std::cin.fail() || numBills < 0) {
+                std::cin.clear(); // 잘못된 입력 제거
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                std::cout << "Invalid input. Please enter a non-negative integer." << std::endl;
+            }
+            else {
+                break;
+            }
+        } while (true);
+
+        result[i] = numBills;
+    }
+
+    return result;
 }
 
 void SessionManager::createAccount() {
