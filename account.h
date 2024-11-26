@@ -37,6 +37,9 @@ public:
     bool withdraw(int amount);                    // 출금
     void addTransaction(const string& transaction); // 거래 내역 추가
     void setBankName(Bank& bank);         // 은행 이름 설정
+    Bank* getBank() const {
+    return bankName;
+    }
 };
 
 class normalAccount : public Account{ // 일반 계좌 정보 
