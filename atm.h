@@ -82,6 +82,7 @@ public:
     void setAtmCashBalance(double amount) { atmCashBalance = amount; }
     double calculateFee(Bank* recipientBank, Bank* senderBank);
     void addCash(int* bills);
+    void showCashInventory() const;
 };
 
 #endif // ATM_H

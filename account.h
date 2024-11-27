@@ -11,7 +11,7 @@ using namespace std;
 class Account {
 protected:
     string accName;                   // 사용자 이름
-    int accNumber;                    // 계좌 번호
+    long long accNumber;                    // 계좌 번호
     int password;                     // 계좌 비밀번호
     int accbalance;                   // 계좌 잔액
     Bank* bankName;                  // 은행 이름
@@ -37,6 +37,9 @@ public:
     bool withdraw(int amount);                    // 출금
     void addTransaction(const string& transaction); // 거래 내역 추가
     void setBankName(Bank& bank);         // 은행 이름 설정
+    Bank* getBank() const {
+    return bankName;
+    }
 };
 
 class normalAccount : public Account{ // 일반 계좌 정보 

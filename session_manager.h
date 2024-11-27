@@ -19,6 +19,8 @@ public:
     void createAccount();
     ATM* selectATM();
     void run();
+    int* depositcashtoatm(ATM* atm);
+    void depositCashToATM(ATM* atm);
     
 private:
     void cleanup();
