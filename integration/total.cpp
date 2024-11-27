@@ -245,9 +245,12 @@ Account* Bank::getAccount(long long accountNumber) const {
 
 void Bank::printbankaccount() const {
     for (int i = 0; i < numaccounts; i++) {
+        if (accounts[i]->getAccNumber() == 1111) {
+            continue;
+        }
         cout << "Bank: " << bankname
             << ", Username: " << accounts[i]->getAccName()
-            << ", Account: " << accounts[i]->getAccNumber()
+            << ", Account Number: " << accounts[i]->getAccNumber()
             << ", Balance: " << accounts[i]->getBalance() << endl;
     }
 }
@@ -355,20 +358,18 @@ std::vector<Bank*> banks;
 std::vector<ATM*> atms;
 
 void printATMsinfo() {
-    std::cout << "=== ATMs Information ===\n";
     for (size_t i = 0; i < atms.size(); i++) {
-        std::cout << "ATM serial number: " << atms[i]->getSerialNumber()<<endl;
+        std::cout << "ATM serial number: " << atms[i]->getSerialNumber() << endl;
         atms[i]->showCashInventory();
     }
 }
 
 void printAccountsinfo() {
     for (size_t i = 0; i < banks.size(); i++) {
-        std::cout << "=== Accounts Information ===\n";
-        std::cout << "Account" << i + 1 << ": ";
         banks[i]->printbankaccount();
     }
 }
+
 
 void ATM::recordTransaction(const std::string& transaction) {
     transactionLog.push_back(transaction);
@@ -499,7 +500,7 @@ bool Session::processUserChoice(ATM* atm) {
             std::cout << "3. 이체\n";
             std::cout << "4. 잔액 확인\n";
             std::cout << "5. 세션 종료\n";
-            std::cout << "/ : ATM 및 계좌 정보 표시\n"; 
+            std::cout << "/ : ATM 및 계좌 정보 표시\n";
             std::cout << "옵션을 선택하세요: ";
         }
 
@@ -908,7 +909,7 @@ bool ATM::insertCard(Account* account) {
     }
     else {
         cout << "카드가 인식되었습니다. 환영합니다!\n";
-    return true;
+        return true;
     }
 }
 
@@ -972,14 +973,14 @@ void ATM::showCashInventory() const {
             std::cout << denominationValues[i] << " won bills: " << cashInventory[i] << std::endl;
         }
         else {
-        std::cout << denominationValues[i] << "원권: " << cashInventory[i] << "장" << std::endl;
+            std::cout << denominationValues[i] << "원권: " << cashInventory[i] << "장" << std::endl;
         }
     }
     if (currentLanguage == Language::English) {
         std::cout << "Total Cash Balance: " << atmCashBalance << " won" << std::endl;
     }
     else {
-    std::cout << "전체 금액: " << atmCashBalance << "원" << std::endl;
+        std::cout << "전체 금액: " << atmCashBalance << "원" << std::endl;
     }
 }
 
@@ -1080,7 +1081,7 @@ void ATM::deposit() {
     totalAmount += totalFee;
     this->cashInventory[3] += fee / 1000;
     string message;
-    message = "Account number:"+ to_string(account->getAccNumber()) + "User Name:"+ account->getAccName()+"->ID:"+ to_string(account->gettransactionID()) +"->Deposit" + to_string(totalAmount) + "\n";
+    message = "Account number:" + to_string(account->getAccNumber()) + "User Name:" + account->getAccName() + "->ID:" + to_string(account->gettransactionID()) + "->Deposit" + to_string(totalAmount) + "\n";
 
     account->deposit(totalAmount - fee);
     atmCashBalance += (depositType == 1 ? totalAmount : 0);
@@ -1173,47 +1174,10 @@ void ATM::withdraw() {
         return;
     }
 
-    // 수수료 계산
-    if (currentLanguage == Language::English) {
-        cout << "Withdrawal fee: " << fee << " won\n";
-    }
-    else {
-        cout << "출금 수수료: " << fee << "원\n";
-    }
-    int totalFee = 0;
-    int additionalFee = 0;
-
-    // 수수료를 사용자로부터 받기
-    while (totalFee < fee) {
-        if (currentLanguage == Language::English) {
-            cout << "Please insert the fee. (" << totalFee << "/" << fee << ")\n";
-        }
-        else {
-            cout << "수수료를 넣어주세요. (" << totalFee << "/" << fee << ")\n";
-        }
-        std::cin >> additionalFee;
-
-        if (totalFee + additionalFee > fee) {
-            if (currentLanguage == Language::English) {
-                cout << "The fee you entered exceeds the required fee. Returning the most recently entered " << additionalFee << " won." << endl;
-            }
-            else {
-                cout << "입력하신 수수료가 초과되었습니다. " << "가장 최근에 입력한 " << additionalFee << "원을 반환합니다." << endl;
-            }
-        }
-        else {
-            totalFee += additionalFee;
-        }
-    }
-
-    // 수수료를 현금 재고에 추가
-    this->cashInventory[3] += totalFee / 1000;
-    atmCashBalance += totalFee;
-
     // 지폐별 출금 계산
     const int denominationValues[4] = { 50000, 10000, 5000, 1000 };
     int withdrawalBills[4] = { 0, 0, 0, 0 };
-    double remainingAmount = amount;
+    double remainingAmount = totalAmount - fee;
 
     for (int i = 0; i < 4; i++) {
         int neededBills = static_cast<int>(remainingAmount / denominationValues[i]);
@@ -1239,9 +1203,9 @@ void ATM::withdraw() {
         cashInventory[i] -= withdrawalBills[i];
         atmCashBalance -= withdrawalBills[i] * denominationValues[i];
     }
-
+    
     // 계좌에서 금액 차감
-    if (account->withdraw(totalAmount - fee)) {
+    if (account->withdraw(totalAmount)) {
         withdrawalCount++;
         Transaction trans("Withdrawal", amount, account);
         currentSession->addTransaction(trans);
@@ -1290,8 +1254,6 @@ void ATM::withdraw() {
 
 
 
-
-
 void ATM::transfer() {
     if (!currentSession) {
         if (currentLanguage == Language::English) {
@@ -1315,10 +1277,10 @@ void ATM::transfer() {
 
     if (transferType != 1 && transferType != 2) {
         if (currentLanguage == Language::English) {
-            cout << "Invalid transfer type." << endl;
+            cout << "Transfer canceled." << endl;
         }
         else {
-            cout << "잘못된 송금 유형입니다." << endl;
+            cout << "송금이 취소되었습니다." << endl;
         }
         return;
     }
@@ -1334,13 +1296,13 @@ void ATM::transfer() {
     else {
         cout << "송금하려는 은행을 입력하시오" << endl;
     }
-    for (size_t i = 0; i < supportedBanks.size(); i++) {
-        cout << i + 1 << ". " << supportedBanks[i]->getbankname() << endl;
+    for (size_t i = 0; i < banks.size(); i++) {
+        cout << i + 1 << ". " << banks[i]->getbankname() << endl;
     }
     int bankChoice;
     cin >> bankChoice;
 
-    if (bankChoice < 1 || bankChoice > supportedBanks.size()) {
+    if (bankChoice < 1 || bankChoice > banks.size()) {
         if (currentLanguage == Language::English) {
             cout << "Invalid bank choice." << endl;
         }
@@ -1349,7 +1311,7 @@ void ATM::transfer() {
         }
         return;
     }
-    transferBank = supportedBanks[bankChoice - 1];
+    transferBank = banks[bankChoice - 1];
 
     // 계좌 번호 입력 및 확인
     if (currentLanguage == Language::English) {
@@ -1403,36 +1365,9 @@ void ATM::transfer() {
         else {
             cout << "송금 수수료: " << fee << "원\n";
         }
-        int totalFee = 0;
-        int additionalFee = 0;
-
-        // 수수료를 사용자로부터 받기
-        while (totalFee < fee) {
-            if (currentLanguage == Language::English) {
-                cout << "Please insert the fee. (" << totalFee << "/" << fee << ")\n";
-            }
-            else {
-                cout << "수수료를 넣어주세요. (" << totalFee << "/" << fee << ")\n";
-            }
-            std::cin >> additionalFee;
-
-            if (totalFee + additionalFee > fee) {
-                if (currentLanguage == Language::English) {
-                    cout << "The fee you entered exceeds the required fee. Returning the most recently entered " << additionalFee << " won." << endl;
-                }
-                else {
-                    cout << "입력하신 수수료가 초과되었습니다. " << "가장 최근에 입력한 " << additionalFee << "원을 반환합니다." << endl;
-                }
-            }
-            else {
-                totalFee += additionalFee;
-            }
-        }
-        this->cashInventory[3] += totalFee / 1000;
-        atmCashBalance += totalFee;
 
         //송금
-        sourceAccount->withdraw(transferAmount);
+        sourceAccount->withdraw(transferAmount + fee);
         transferAccount->deposit(transferAmount);
         Transaction trans("Transfer(Account)", transferAmount, sourceAccount);
         currentSession->addTransaction(trans);
@@ -1447,7 +1382,7 @@ void ATM::transfer() {
             sourceAccount->plustransactionID();
         }
         string message;
-        message = "Account number:" + to_string(currentSession->getActiveAccount()->getAccNumber()) + "User Name:" + currentSession->getActiveAccount()->getAccName() + "->ID:" + to_string(sourceAccount->gettransactionID()) + "->transfer:" + to_string(transferAmount) +", To"+ to_string(recipientAccountNumber) + "\n";
+        message = "Account number:" + to_string(currentSession->getActiveAccount()->getAccNumber()) + "User Name:" + currentSession->getActiveAccount()->getAccName() + "->ID:" + to_string(sourceAccount->gettransactionID()) + "->transfer:" + to_string(transferAmount) + ", To" + to_string(recipientAccountNumber) + "\n";
         history += message;
         ofstream outfile;
         outfile.open(filePath, ios_base::app);
@@ -1582,8 +1517,6 @@ void ATM::transfer() {
 
     return;
 }
-
-
 
 
 class SessionManager {
@@ -1894,9 +1827,9 @@ void SessionManager::createAccount() {
         }
         break;
     } while (true);
-    
+
     try {
-        auto t= banks[bankIndex]->getAccount(accountNumber);
+        auto t = banks[bankIndex]->getAccount(accountNumber);
         if (t != nullptr) {
             throw std::runtime_error("Account already exists.");
         }
@@ -2060,5 +1993,3 @@ int main() {
     manager.run();
     return 0;
 }
-
-//deposit, withdraw, transfer, showcashinventory, addcash 수정했음, Bank* getBank(Bank& bank);Account의 public 메서드에 추가함

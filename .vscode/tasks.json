@@ -8,12 +8,14 @@
                 "/Zi",
                 "/EHsc",
                 "/nologo",
-                "/Fe${workspaceFolder}\\main.exe",
-                "${workspaceFolder}\\main.cpp",
-                "${workspaceFolder}\\atm.cpp",
-                "${workspaceFolder}\\Account.cpp",
-                "${workspaceFolder}\\bank.cpp",
-                "${workspaceFolder}\\session_manager.cpp"
+                // "/Fe${workspaceFolder}\\main.exe",
+                // "${workspaceFolder}\\main.cpp",
+                // "${workspaceFolder}\\atm.cpp",
+                // "${workspaceFolder}\\Account.cpp",
+                // "${workspaceFolder}\\bank.cpp",
+                // "${workspaceFolder}\\session_manager.cpp"
+                "/Fe${workspaceFolder}\\integration\\total.exe",
+                "${workspaceFolder}\\integration\\total.cpp",
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
